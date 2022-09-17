@@ -79,14 +79,15 @@ own LED).  The keypads have their own circuit boards (which do the diodes).
 
 **Intended use:** For places that do speaking events with one or more speakers 
 giving a presentation on a stage.
--	**The space:** A stage with say 8 different areas (4 upstage, 4 downstage)
--	**The control surface:** Has 8 different areas representing the stage areas
+-	**The space:** A stage with say 7 different areas
+-	**The control surface:** Has 7 different areas representing the stage areas
 -	**Each area:**
 	-	*Stage:* Has up to 9 devices (lights, microphones, cameras, HDMI 
 		computers) associated with it
 	-	*Control Surface:* Has 9 LED keys (3x3) representing the different 
-		devices.  Some stage areas might warrant fewer devices, and only need a 
-		2x2 keypad.  There will also be extra buttons, LEDs, and some pots.  
+		devices for the area.  Some stage areas might warrant fewer devices, and 
+		only need a 2x2 keypad.  There will also be extra buttons, LEDs, and 
+		some pots for whatever is needed.
 
 If more stage areas are needed, simply chain more boards together (should work 
 up to at least 2, hopefully 4).
@@ -98,8 +99,8 @@ up to at least 2, hopefully 4).
 ### Features
 -	**ModularDeck Input Header:** 1
 -	**ModularDeck Output Header:** 1 (Analog Shift 1)
--	**3x3 keypad headers:** 4
--	**2x2 keypad headers:** 3
+-	**3x3 keypad headers:** 4 (total of 36 LED keys)
+-	**2x2 keypad headers:** 3 (total of 12 LED keys)
 -	**Digital inputs:** 16 (excluding keypads)
 -	**Digital outputs:** 16 (excluding keypads)
 -	**Analog inputs:** 16
