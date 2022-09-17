@@ -26,6 +26,8 @@ The boards are as follows:
 **Description:** Contains all the necessary components for an OpenDeck board; 
 basically the OpenDeck 3, but with all the parts in the Breakout boards removed.
 
+**Schematic:** [Base Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/BaseBoard/v1.0.0/ModularDeck-r1.0.0.pdf)
+
 ### Planning
 -	**Status:** Schematic complete, no PCB
 -	**Intention:** Tim will do PCB if no-one else does
@@ -44,6 +46,8 @@ basically the OpenDeck 3, but with all the parts in the Breakout boards removed.
 74HCT125 is replaced with a TXB0104PW (so that we can daisy-chain out the LEDs).
 Doesn't daisy-chain the MUXs very well (see Standard Breakout Board for that).
 
+**Schematic:** [Classic Breakout Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/ClassicBreakoutBoard/v1.0.0/ClassicBreakoutBoard.pdf)
+
 ### Planning
 -	**Status:** Schematic complete, no PCB
 -	**Intention:** None
@@ -60,6 +64,8 @@ Doesn't daisy-chain the MUXs very well (see Standard Breakout Board for that).
 **Description:** Like the Classic Breakout Board, except:
 -	Only one Analog MUX, but the board can chain better
 -	Only 1 set of buttons
+
+**Schematic:** [Standard Breakout Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/StandardBreakoutBoard/v1.0.0/StandardBreakoutBoard.pdf)
 
 ### Planning
 -	**Status:** Schematic complete, no PCB
@@ -91,6 +97,10 @@ giving a presentation on a stage.
 
 If more stage areas are needed, simply chain more boards together (should work 
 up to at least 2, hopefully 4).
+
+**Schematic:** [3x3 Breakout Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/3x3BreakoutBoard/v1.0.0/3x3BreakoutBoard.pdf)
+**Schematic:** [3x3 Keypad Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/3x3BreakoutBoard/v1.0.0/3x3Keypad/3x3Keypad.pdf)
+
 
 ### Planning
 -	**Status:** Schematic complete, no PCB
