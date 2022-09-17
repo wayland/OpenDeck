@@ -98,8 +98,9 @@ giving a presentation on a stage.
 If more stage areas are needed, simply chain more boards together (should work 
 up to at least 2, hopefully 4).
 
-**Schematic:** [3x3 Breakout Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/3x3BreakoutBoard/v1.0.0/3x3BreakoutBoard.pdf)
-**Schematic:** [3x3 Keypad Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/3x3BreakoutBoard/v1.0.0/3x3Keypad/3x3Keypad.pdf)
+**Schematics:**
+-	[3x3 Breakout Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/3x3BreakoutBoard/v1.0.0/3x3BreakoutBoard.pdf)
+-	[3x3 Keypad Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/3x3BreakoutBoard/v1.0.0/3x3Keypad/3x3Keypad.pdf)
 
 
 ### Planning
