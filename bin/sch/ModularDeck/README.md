@@ -102,6 +102,8 @@ up to at least 2, hopefully 4).
 -	[3x3 Breakout Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/3x3BreakoutBoard/v1.0.0/3x3BreakoutBoard.pdf)
 -	[3x3 Keypad Board](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/3x3BreakoutBoard/v1.0.0/3x3Keypad/3x3Keypad.pdf)
 
+**Diagram:** [Breakout Board Logical Button Diagram](https://github.com/wayland/OpenDeck/blob/master/bin/sch/ModularDeck/3x3BreakoutBoard/v1.0.0/LogicalButtons.svg)
+
 
 ### Planning
 -	**Status:** Schematic complete, no PCB
