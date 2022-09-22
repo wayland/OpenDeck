@@ -4139,7 +4139,7 @@
   (symbol (lib_id "Connector_Generic:Conn_02x04_Top_Bottom") (at 135.89 100.33 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid a5972cb8-4854-4b37-9fb2-fb1d5ab865eb)
-    (property "Reference" "KP6" (id 0) (at 137.16 91.44 0))
+    (property "Reference" "KP7" (id 0) (at 137.16 91.44 0))
     (property "Value" "Conn_02x04_Top_Bottom" (id 1) (at 137.16 93.98 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -4149,7 +4149,7 @@
     (property "Datasheet" "~" (id 3) (at 135.89 100.33 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "Description" "To Keypad 6" (id 4) (at 137.16 93.98 0))
+    (property "Description" "To Keypad 7" (id 4) (at 137.16 93.98 0))
     (pin "1" (uuid ae2e1719-970b-40a4-8479-27ef1681e1d0))
     (pin "2" (uuid ec637956-f33c-4511-a8e2-f74319129368))
     (pin "3" (uuid ea5993c7-c72e-41d5-b253-792d25db219c))
@@ -4790,7 +4790,7 @@
       (reference "KP6") (unit 1) (value "Conn_02x04_Top_Bottom") (footprint "")
     )
     (path "/a5972cb8-4854-4b37-9fb2-fb1d5ab865eb"
-      (reference "KP6") (unit 1) (value "Conn_02x04_Top_Bottom") (footprint "")
+      (reference "KP7") (unit 1) (value "Conn_02x04_Top_Bottom") (footprint "")
     )
     (path "/4df21a80-b9e5-4aa0-9eba-0b7d570cd0ab"
       (reference "OH?") (unit 1) (value "~") (footprint "")
