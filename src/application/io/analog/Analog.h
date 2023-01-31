@@ -27,14 +27,14 @@ limitations under the License.
 
 #ifdef HW_SUPPORT_ADC
 
-using namespace Protocol;
+using namespace protocol;
 
-namespace IO
+namespace io
 {
-    class Analog : public IO::Base
+    class Analog : public io::Base
     {
         public:
-        class Collection : public Common::BaseCollection<HW_SUPPORTED_NR_OF_ANALOG_INPUTS>
+        class Collection : public common::BaseCollection<HW_SUPPORTED_NR_OF_ANALOG_INPUTS>
         {
             public:
             Collection() = delete;
@@ -56,7 +56,7 @@ namespace IO
             NRPN_14BIT,
             PITCH_BEND,
             CONTROL_CHANGE_14BIT,
-            DMX,
+            RESERVED,
             AMOUNT
         };
 
@@ -69,6 +69,8 @@ namespace IO
         class HWA
         {
             public:
+            virtual ~HWA() = default;
+
             // should return true if the value has been refreshed, false otherwise
             virtual bool value(size_t index, uint16_t& value) = 0;
         };
@@ -85,12 +87,14 @@ namespace IO
                 uint16_t       maxValue    = 127;
             };
 
+            virtual ~Filter() = default;
+
             virtual bool     isFiltered(size_t index, descriptor_t& descriptor) = 0;
             virtual uint16_t lastValue(size_t index)                            = 0;
             virtual void     reset(size_t index)                                = 0;
         };
 
-        using Database = Database::User<Database::Config::Section::analog_t>;
+        using Database = database::User<database::Config::Section::analog_t>;
 
         Analog(HWA&      hwa,
                Filter&   filter,
@@ -112,7 +116,7 @@ namespace IO
             uint8_t            lowerOffset = 0;
             uint8_t            upperOffset = 0;
             uint16_t           maxValue    = 127;
-            Messaging::event_t event;
+            messaging::event_t event;
 
             analogDescriptor_t() = default;
         };
@@ -124,27 +128,28 @@ namespace IO
         void                   sendMessage(size_t index, analogDescriptor_t& descriptor);
         void                   setFSRstate(size_t index, bool state);
         bool                   fsrState(size_t index);
-        std::optional<uint8_t> sysConfigGet(System::Config::Section::analog_t section, size_t index, uint16_t& value);
-        std::optional<uint8_t> sysConfigSet(System::Config::Section::analog_t section, size_t index, uint16_t value);
+        std::optional<uint8_t> sysConfigGet(sys::Config::Section::analog_t section, size_t index, uint16_t& value);
+        std::optional<uint8_t> sysConfigSet(sys::Config::Section::analog_t section, size_t index, uint16_t value);
 
         HWA&      _hwa;
         Filter&   _filter;
         Database& _database;
 
-        uint8_t _fsrPressed[Collection::size() / 8 + 1] = {};
+        uint8_t _fsrPressed[Collection::SIZE() / 8 + 1] = {};
 
         static constexpr MIDI::messageType_t INTERNAL_MSG_TO_MIDI_TYPE[static_cast<uint8_t>(type_t::AMOUNT)] = {
-            MIDI::messageType_t::CONTROL_CHANGE,
-            MIDI::messageType_t::NOTE_ON,
-            MIDI::messageType_t::NOTE_ON,    // fsr: set to off when appropriate
-            MIDI::messageType_t::INVALID,    // button: let other listeners handle this
-            MIDI::messageType_t::NRPN_7BIT,
-            MIDI::messageType_t::NRPN_14BIT,
-            MIDI::messageType_t::PITCH_BEND,
-            MIDI::messageType_t::CONTROL_CHANGE_14BIT,
+            MIDI::messageType_t::CONTROL_CHANGE,          // POTENTIOMETER_CONTROL_CHANGE
+            MIDI::messageType_t::NOTE_ON,                 // POTENTIOMETER_NOTE
+            MIDI::messageType_t::NOTE_ON,                 // FSR (set to note off when appropriate)
+            MIDI::messageType_t::INVALID,                 // BUTTON (let other listeners handle this)
+            MIDI::messageType_t::NRPN_7BIT,               // NRPN_7BIT
+            MIDI::messageType_t::NRPN_14BIT,              // NRPN_14BIT
+            MIDI::messageType_t::PITCH_BEND,              // PITCH_BEND
+            MIDI::messageType_t::CONTROL_CHANGE_14BIT,    // CONTROL_CHANGE_14BIT
+            MIDI::messageType_t::INVALID,                 // RESERVED
         };
     };
-}    // namespace IO
+}    // namespace io
 
 #else
 #include "stub/Analog.h"

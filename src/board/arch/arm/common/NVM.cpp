@@ -34,21 +34,6 @@ namespace
             return true;
         }
 
-        uint32_t startAddress(EmuEEPROM::page_t page) override
-        {
-            switch (page)
-            {
-            case EmuEEPROM::page_t::PAGE_FACTORY:
-                return CORE_MCU_FLASH_PAGE_ADDR(FLASH_PAGE_FACTORY);
-
-            case EmuEEPROM::page_t::PAGE_2:
-                return CORE_MCU_FLASH_PAGE_ADDR(FLASH_PAGE_EEPROM_2);
-
-            default:
-                return CORE_MCU_FLASH_PAGE_ADDR(FLASH_PAGE_EEPROM_1);
-            }
-        }
-
         bool erasePage(EmuEEPROM::page_t page) override
         {
             switch (page)
@@ -86,14 +71,30 @@ namespace
             }
         }
 
-        bool write32(uint32_t address, uint32_t data) override
+        bool write32(EmuEEPROM::page_t page, uint32_t offset, uint32_t data) override
         {
-            return core::mcu::flash::write32(address, data);
+            return core::mcu::flash::write32(START_ADDRESS(page) + offset, data);
         }
 
-        bool read32(uint32_t address, uint32_t& data) override
+        bool read32(EmuEEPROM::page_t page, uint32_t offset, uint32_t& data) override
         {
-            return core::mcu::flash::read32(address, data);
+            return core::mcu::flash::read32(START_ADDRESS(page) + offset, data);
+        }
+
+        private:
+        static constexpr uint32_t START_ADDRESS(EmuEEPROM::page_t page)
+        {
+            switch (page)
+            {
+            case EmuEEPROM::page_t::PAGE_FACTORY:
+                return CORE_MCU_FLASH_PAGE_ADDR(FLASH_PAGE_FACTORY);
+
+            case EmuEEPROM::page_t::PAGE_2:
+                return CORE_MCU_FLASH_PAGE_ADDR(FLASH_PAGE_EEPROM_2);
+
+            default:
+                return CORE_MCU_FLASH_PAGE_ADDR(FLASH_PAGE_EEPROM_1);
+            }
         }
     };
 
@@ -101,7 +102,7 @@ namespace
     EmuEEPROM    _emuEEPROM(_emuEEPROMHWA, true);
 }    // namespace
 
-namespace Board::NVM
+namespace board::nvm
 {
     bool init()
     {
@@ -113,7 +114,7 @@ namespace Board::NVM
         return _emuEEPROM.maxAddress();
     }
 
-    bool read(uint32_t address, int32_t& value, parameterType_t type)
+    bool read(uint32_t address, uint32_t& value, parameterType_t type)
     {
         uint16_t tempData;
 
@@ -122,7 +123,7 @@ namespace Board::NVM
         case parameterType_t::BYTE:
         case parameterType_t::WORD:
         {
-            auto readStatus = _emuEEPROM.readCached(address, tempData);
+            auto readStatus = _emuEEPROM.read(address, tempData);
             value           = tempData;
 
             if (readStatus == EmuEEPROM::readStatus_t::OK)
@@ -144,7 +145,7 @@ namespace Board::NVM
         return true;
     }
 
-    bool write(uint32_t address, int32_t value, parameterType_t type)
+    bool write(uint32_t address, uint32_t value, parameterType_t type, bool cacheOnly)
     {
         uint16_t tempData;
 
@@ -155,7 +156,7 @@ namespace Board::NVM
         {
             tempData = value;
 
-            if (_emuEEPROM.write(address, tempData) != EmuEEPROM::writeStatus_t::OK)
+            if (_emuEEPROM.write(address, tempData, cacheOnly) != EmuEEPROM::writeStatus_t::OK)
             {
                 return false;
             }
@@ -174,4 +175,9 @@ namespace Board::NVM
     {
         return _emuEEPROM.format();
     }
-}    // namespace Board::NVM
+
+    void writeCacheToFlash()
+    {
+        _emuEEPROM.writeCacheToFlash();
+    }
+}    // namespace board::nvm

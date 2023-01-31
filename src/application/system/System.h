@@ -32,7 +32,7 @@ limitations under the License.
 #include "Config.h"
 #include "Layout.h"
 
-namespace System
+namespace sys
 {
     class Instance
     {
@@ -59,6 +59,8 @@ namespace System
         class HWA
         {
             public:
+            virtual ~HWA() = default;
+
             virtual bool init()                                                                        = 0;
             virtual void update()                                                                      = 0;
             virtual void reboot(FwSelector::fwType_t type)                                             = 0;
@@ -68,16 +70,18 @@ namespace System
         class Components
         {
             public:
-            virtual std::array<::IO::Base*, static_cast<size_t>(::IO::ioComponent_t::AMOUNT)>&          io()       = 0;
-            virtual std::array<::Protocol::Base*, static_cast<size_t>(::Protocol::protocol_t::AMOUNT)>& protocol() = 0;
-            virtual Database::Admin&                                                                    database() = 0;
+            virtual ~Components() = default;
+
+            virtual std::array<::io::Base*, static_cast<size_t>(::io::ioComponent_t::AMOUNT)>&          io()       = 0;
+            virtual std::array<::protocol::Base*, static_cast<size_t>(::protocol::protocol_t::AMOUNT)>& protocol() = 0;
+            virtual database::Admin&                                                                    database() = 0;
         };
 
         Instance(HWA&        hwa,
                  Components& components);
 
         bool              init();
-        IO::ioComponent_t run();
+        io::ioComponent_t run();
 
         private:
         class SysExDataHandler : public SysExConf::DataHandler
@@ -96,7 +100,7 @@ namespace System
             Instance& _system;
         };
 
-        class DBhandlers : public Database::Admin::Handlers
+        class DBhandlers : public database::Admin::Handlers
         {
             public:
             DBhandlers(Instance& system)
@@ -118,7 +122,7 @@ namespace System
             SCHEDULED_TASK_FORCED_REFRESH,
         };
 
-        IO::ioComponent_t checkComponents();
+        io::ioComponent_t checkComponents();
         void              checkProtocols();
         void              backup();
         void              forceComponentRefresh();
@@ -128,8 +132,8 @@ namespace System
         DBhandlers          _dbHandlers;
         SysExDataHandler    _sysExDataHandler;
         SysExConf           _sysExConf;
-        Util::Scheduler     _scheduler;
-        Util::ComponentInfo _cInfo;
+        util::Scheduler     _scheduler;
+        util::ComponentInfo _cInfo;
         Layout              _layout;
 
         static constexpr SysExConf::manufacturerID_t SYS_EX_MID = {
@@ -146,7 +150,7 @@ namespace System
         };
 
         backupRestoreState_t _backupRestoreState                                                    = backupRestoreState_t::NONE;
-        IO::ioComponent_t    _componentIndex                                                        = IO::ioComponent_t::AMOUNT;
-        size_t               _componentUpdateIndex[static_cast<uint8_t>(IO::ioComponent_t::AMOUNT)] = {};
+        io::ioComponent_t    _componentIndex                                                        = io::ioComponent_t::AMOUNT;
+        size_t               _componentUpdateIndex[static_cast<uint8_t>(io::ioComponent_t::AMOUNT)] = {};
     };
-}    // namespace System
+}    // namespace sys

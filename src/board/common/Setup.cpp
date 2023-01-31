@@ -20,6 +20,7 @@ limitations under the License.
 #include "board/Internal.h"
 #include "core/src/Timing.h"
 #include "core/src/MCU.h"
+#include "board/common/communication/USBOverSerial/USBOverSerial.h"
 
 namespace core::timing::detail
 {
@@ -39,7 +40,7 @@ namespace
     bool _usbInitialized;
 }    // namespace
 
-namespace Board
+namespace board
 {
     void init()
     {
@@ -51,12 +52,12 @@ namespace Board
         core::mcu::timers::allocate(mainTimerIndex, []()
                                     {
                                         core::timing::detail::ms++;
-                                        detail::IO::indicators::update();
+                                        detail::io::indicators::update();
 #ifndef HW_USB_OVER_SERIAL_HOST
-                                        detail::IO::digitalIn::update();
+                                        detail::io::digitalIn::update();
 #ifndef BOARD_USE_FAST_SOFT_PWM_TIMER
 #if HW_MAX_NR_OF_DIGITAL_OUTPUTS > 0
-                                        detail::IO::digitalOut::update();
+                                        detail::io::digitalOut::update();
 #endif
 #endif
 #endif
@@ -73,7 +74,7 @@ namespace Board
 #ifdef FW_APP
 #ifndef HW_USB_OVER_SERIAL_HOST
 #if HW_MAX_NR_OF_DIGITAL_OUTPUTS > 0
-                                        detail::IO::digitalOut::update();
+                                        detail::io::digitalOut::update();
 #endif
 #endif
 #endif
@@ -90,7 +91,7 @@ namespace Board
         core::mcu::timers::allocate(mainTimerIndex, []()
                                     {
                                         core::timing::detail::ms++;
-                                        detail::IO::indicators::update();
+                                        detail::io::indicators::update();
                                     });
 
         // don't start the timers yet - if the app will be run immediately, it's not needed
@@ -98,14 +99,14 @@ namespace Board
 #endif
     }
 
-    namespace USB
+    namespace usb
     {
         initStatus_t init()
         {
             // allow usb init only once
             if (!_usbInitialized)
             {
-                detail::USB::init();
+                detail::usb::init();
                 _usbInitialized = true;
 
                 return initStatus_t::OK;
@@ -113,25 +114,65 @@ namespace Board
 
             return initStatus_t::ALREADY_INIT;
         }
-    }    // namespace USB
+
+        void deInit()
+        {
+            if (_usbInitialized)
+            {
+                detail::usb::deInit();
+                _usbInitialized = false;
+            }
+        }
+
+        bool isInitialized()
+        {
+            return _usbInitialized;
+        }
+    }    // namespace usb
 
     namespace detail::setup
     {
+#ifdef HW_USB_OVER_SERIAL_DEVICE
+        void waitUsbLink()
+        {
+            usbLink::internalCMD_t cmd;
+
+            uint8_t data[1] = {
+                static_cast<uint8_t>(usbLink::internalCMD_t::LINK_READY),
+            };
+
+            usbOverSerial::USBWritePacket packet(usbOverSerial::packetType_t::INTERNAL,
+                                                 data,
+                                                 1,
+                                                 BUFFER_SIZE_USB_OVER_SERIAL);
+
+            while (1)
+            {
+                usbOverSerial::write(HW_UART_CHANNEL_USB_LINK, packet);
+
+                if (detail::usb::readInternal(cmd))
+                {
+                    if (cmd == usbLink::internalCMD_t::LINK_READY)
+                    {
+                        break;
+                    }
+                }
+
+                core::timing::waitMs(50);
+            }
+        }
+#endif
+
         void bootloader()
         {
             // partial initialization - init the rest in runBootloader() if it's determined that bootloader should really run
 
             core::mcu::init(core::mcu::initType_t::BOOT);
             core::mcu::timers::init();
-            detail::IO::init();
+            detail::io::init();
 
 #ifdef HW_USB_OVER_SERIAL
-            Board::UART::config_t config(Board::detail::USB::USB_OVER_SERIAL_BAUDRATE,
-                                         Board::UART::parity_t::NO,
-                                         Board::UART::stopBits_t::ONE,
-                                         Board::UART::type_t::RX_TX);
-
-            Board::UART::init(HW_UART_CHANNEL_USB_LINK, config);
+            board::uart::init(HW_UART_CHANNEL_USB_LINK, board::detail::usb::USB_OVER_SERIAL_BAUDRATE);
 #endif
         }
 
@@ -139,36 +180,17 @@ namespace Board
         {
             core::mcu::init(core::mcu::initType_t::APP);
             core::mcu::timers::init();
-            detail::IO::init();
-            detail::IO::indicators::indicateApplicationLoad();
+            detail::io::init();
+            detail::io::indicators::indicateApplicationLoad();
 
 #ifdef HW_USB_OVER_SERIAL
-            Board::UART::config_t config(Board::detail::USB::USB_OVER_SERIAL_BAUDRATE,
-                                         Board::UART::parity_t::NO,
-                                         Board::UART::stopBits_t::ONE,
-                                         Board::UART::type_t::RX_TX);
-
-            Board::UART::init(HW_UART_CHANNEL_USB_LINK, config);
+            board::uart::init(HW_UART_CHANNEL_USB_LINK, board::detail::usb::USB_OVER_SERIAL_BAUDRATE);
 #endif
 
 #ifdef HW_USB_OVER_SERIAL_DEVICE
-            // wait for unique id from usb host
-            // this is to make sure host and the device share the same unique id
-            USBLink::internalCMD_t cmd;
-
-            while (1)
-            {
-                while (!detail::USB::readInternal(cmd))
-                {
-                    ;
-                }
-
-                if (cmd == USBLink::internalCMD_t::UNIQUE_ID)
-                {
-                    break;
-                }
-            }
+            // do not proceed with application load until usb link is ready
+            waitUsbLink();
 #endif
         }
     }    // namespace detail::setup
-}    // namespace Board
+}    // namespace board

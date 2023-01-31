@@ -19,12 +19,12 @@ limitations under the License.
 #pragma once
 
 #include "io/IOBase.h"
-namespace IO
+namespace io
 {
-    class Analog : public IO::Base
+    class Analog : public io::Base
     {
         public:
-        class Collection : public Common::BaseCollection<0>
+        class Collection : public common::BaseCollection<0>
         {
             public:
             Collection() = delete;
@@ -45,7 +45,7 @@ namespace IO
             NRPN_14BIT,
             PITCH_BEND,
             CONTROL_CHANGE_14BIT,
-            DMX,
+            RESERVED,
             AMOUNT
         };
 
@@ -58,6 +58,8 @@ namespace IO
         class HWA
         {
             public:
+            virtual ~HWA() = default;
+
             virtual bool value(size_t index, uint16_t& value) = 0;
         };
 
@@ -73,13 +75,15 @@ namespace IO
                 uint16_t       maxValue    = 127;
             };
 
+            virtual ~Filter() = default;
+
             virtual bool     isFiltered(size_t index, descriptor_t& descriptor) = 0;
             virtual uint16_t lastValue(size_t index)                            = 0;
             virtual void     reset(size_t index)                                = 0;
         };
 
         using buttonHandler_t = std::function<void(size_t index, bool state)>;
-        using Database        = Database::User<Database::Config::Section::analog_t>;
+        using Database        = database::User<database::Config::Section::analog_t>;
 
         Analog(HWA&      hwa,
                Filter&   filter,
@@ -103,5 +107,5 @@ namespace IO
         {
             return 0;
         }
-    };    // namespace IO
-}    // namespace IO
+    };
+}    // namespace io

@@ -21,7 +21,7 @@ limitations under the License.
 #include <inttypes.h>
 #include <stddef.h>
 
-namespace Database
+namespace database
 {
     class Config
     {
@@ -58,7 +58,6 @@ namespace Database
             enum class global_t : uint8_t
             {
                 MIDI_SETTINGS,
-                DMX_SETTINGS,
                 AMOUNT
             };
 
@@ -138,4 +137,4 @@ namespace Database
             AMOUNT
         };
     };
-}    // namespace Database
+}    // namespace database

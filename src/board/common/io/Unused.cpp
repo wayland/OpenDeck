@@ -23,15 +23,15 @@ limitations under the License.
 #include "core/src/util/Util.h"
 #include <Target.h>
 
-using namespace Board::detail;
+using namespace board::detail;
 
-namespace Board::detail::IO::unused
+namespace board::detail::io::unused
 {
     void init()
     {
         for (size_t i = 0; i < HW_NR_OF_UNUSED_IO; i++)
         {
-            auto unusedPin = map::unusedPin(i);
+            auto unusedPin = map::UNUSED_PIN(i);
 
             CORE_MCU_IO_INIT(unusedPin.pin.port, unusedPin.pin.index, unusedPin.pin.mode);
 
@@ -44,6 +44,6 @@ namespace Board::detail::IO::unused
             }
         }
     }
-}    // namespace Board::detail::IO::unused
+}    // namespace board::detail::io::unused
 
 #endif

@@ -19,7 +19,7 @@
 #include <HWTestDefines.h>
 #endif
 
-using namespace Protocol;
+using namespace protocol;
 
 class MIDIHelper
 {
@@ -39,7 +39,7 @@ class MIDIHelper
 
     std::vector<MIDI::usbMIDIPacket_t> rawSysExToUSBPackets(std::vector<uint8_t>& raw)
     {
-        Messaging::event_t event;
+        messaging::event_t event;
         event.sysEx       = &raw[0];
         event.sysExLength = raw.size();
         event.message     = MIDI::messageType_t::SYS_EX;
@@ -47,7 +47,7 @@ class MIDIHelper
         return midiToUsbPackets(event);
     }
 
-    std::vector<MIDI::usbMIDIPacket_t> midiToUsbPackets(Messaging::event_t event)
+    std::vector<MIDI::usbMIDIPacket_t> midiToUsbPackets(messaging::event_t event)
     {
         class HWAWriteToUSB : public MIDIlib::USBMIDI::HWA
         {
@@ -225,10 +225,10 @@ class MIDIHelper
     template<typename T>
     std::vector<uint8_t> generateSysExGetReq(T section, size_t index)
     {
-        using namespace System;
+        using namespace sys;
 
-        auto blockIndex = block(section);
-        auto split      = Util::Conversion::Split14bit(index);
+        auto blockIndex = BLOCK(section);
+        auto split      = util::Conversion::Split14bit(index);
 
         std::vector<uint8_t> request = {
             0xF0,
@@ -254,11 +254,11 @@ class MIDIHelper
     template<typename S, typename I, typename V>
     std::vector<uint8_t> generateSysExSetReq(S section, I index, V value)
     {
-        using namespace System;
+        using namespace sys;
 
-        auto blockIndex = block(section);
-        auto splitIndex = Util::Conversion::Split14bit(static_cast<uint16_t>(index));
-        auto splitValue = Util::Conversion::Split14bit(static_cast<uint16_t>(value));
+        auto blockIndex = BLOCK(section);
+        auto splitIndex = util::Conversion::Split14bit(static_cast<uint16_t>(index));
+        auto splitValue = util::Conversion::Split14bit(static_cast<uint16_t>(value));
 
         std::vector<uint8_t> request = {
             0xF0,
@@ -405,14 +405,14 @@ class MIDIHelper
         return cmdResponse;
     }
 
-    bool devicePresent(bool silent = false)
+    bool devicePresent(bool silent, bool bootloader = false)
     {
         if (!silent)
         {
             LOG(INFO) << "Checking if OpenDeck MIDI device is available";
         }
 
-        auto port = amidiPort(OPENDECK_MIDI_DEVICE_NAME);
+        auto port = bootloader ? amidiPort(OPENDECK_DFU_MIDI_DEVICE_NAME) : amidiPort(OPENDECK_MIDI_DEVICE_NAME);
 
         if (port == "")
         {
@@ -467,7 +467,7 @@ class MIDIHelper
 
         std::cout << std::endl;
 
-        Messaging::event_t event;
+        messaging::event_t event;
         event.sysEx       = &request[0];
         event.sysExLength = request.size();
         event.message     = MIDI::messageType_t::SYS_EX;
@@ -493,7 +493,7 @@ class MIDIHelper
         return responseVec;
     }
 
-    void processIncoming(Messaging::event_t event)
+    void processIncoming(messaging::event_t event)
     {
         if (_system == nullptr)
         {
@@ -562,7 +562,7 @@ class MIDIHelper
         if (wish == SysExConf::wish_t::GET)
         {
             // last two bytes are result
-            auto merged = Util::Conversion::Merge14bit(responseUint8.at(responseUint8.size() - 3), responseUint8.at(responseUint8.size() - 2));
+            auto merged = util::Conversion::Merge14bit(responseUint8.at(responseUint8.size() - 3), responseUint8.at(responseUint8.size() - 2));
             return merged.value();
         }
 
@@ -578,7 +578,7 @@ class MIDIHelper
         if (wish == SysExConf::wish_t::GET)
         {
             // last two bytes are result
-            auto merged = Util::Conversion::Merge14bit(response.at(response.size() - 3), response.at(response.size() - 2));
+            auto merged = util::Conversion::Merge14bit(response.at(response.size() - 3), response.at(response.size() - 2));
             return merged.value();
         }
 
@@ -586,39 +586,39 @@ class MIDIHelper
         return response.at(4);
     }
 
-    System::Config::block_t block(System::Config::Section::global_t section)
+    static constexpr sys::Config::block_t BLOCK(sys::Config::Section::global_t section)
     {
-        return System::Config::block_t::GLOBAL;
+        return sys::Config::block_t::GLOBAL;
     }
 
-    System::Config::block_t block(System::Config::Section::button_t section)
+    static constexpr sys::Config::block_t BLOCK(sys::Config::Section::button_t section)
     {
-        return System::Config::block_t::BUTTONS;
+        return sys::Config::block_t::BUTTONS;
     }
 
-    System::Config::block_t block(System::Config::Section::encoder_t section)
+    static constexpr sys::Config::block_t BLOCK(sys::Config::Section::encoder_t section)
     {
-        return System::Config::block_t::ENCODERS;
+        return sys::Config::block_t::ENCODERS;
     }
 
-    System::Config::block_t block(System::Config::Section::analog_t section)
+    static constexpr sys::Config::block_t BLOCK(sys::Config::Section::analog_t section)
     {
-        return System::Config::block_t::ANALOG;
+        return sys::Config::block_t::ANALOG;
     }
 
-    System::Config::block_t block(System::Config::Section::leds_t section)
+    static constexpr sys::Config::block_t BLOCK(sys::Config::Section::leds_t section)
     {
-        return System::Config::block_t::LEDS;
+        return sys::Config::block_t::LEDS;
     }
 
-    System::Config::block_t block(System::Config::Section::i2c_t section)
+    static constexpr sys::Config::block_t BLOCK(sys::Config::Section::i2c_t section)
     {
-        return System::Config::block_t::I2C;
+        return sys::Config::block_t::I2C;
     }
 
-    System::Config::block_t block(System::Config::Section::touchscreen_t section)
+    static constexpr sys::Config::block_t BLOCK(sys::Config::Section::touchscreen_t section)
     {
-        return System::Config::block_t::TOUCHSCREEN;
+        return sys::Config::block_t::TOUCHSCREEN;
     }
 
     TestSystem* _system = nullptr;

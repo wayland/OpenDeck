@@ -7,8 +7,6 @@ OpenDeck is a platform for building MIDI controllers. It is a firmware running o
 
 Solving this two goals means you can forget about implementation details and focus on having your custom controller built as fast as possible.
 
-The platform also supports DMX output so it can be used as DMX interface through `usbserial` plugin in [Open Lighting Architecture](https://www.openlighting.org/).
-
 *Click the image below for a demo video of the [OpenDeck configurator](https://config.shanteacontrols.com)*
 
 [![Watch the video](https://img.youtube.com/vi/7X2LC0JMfAU/maxresdefault.jpg)](https://youtu.be/7X2LC0JMfAU)
@@ -31,25 +29,46 @@ The following components are supported:
 * LCD/OLED displays
 * Touchscreen displays (Nextion and Viewtech/Stone)
 
-OpenDeck supports sending of both 7-bit and 14-bit Non-Registered Part Numbers (NRPN), latching messages on buttons, various encoding modes for quadrature encoders, LED control using MIDI In, configurable MIDI channels for each component individually, DMX output, Bluetooth MIDI etc. Full list of supported features can be found [here](https://github.com/shanteacontrols/OpenDeck/wiki/Configurable-features).
+OpenDeck supports sending of both 7-bit and 14-bit Non-Registered Part Numbers (NRPN), latching messages on buttons, various encoding modes for quadrature encoders, LED control using MIDI In, configurable MIDI channels for each component individually, Bluetooth MIDI etc. Full list of supported features can be found [here](https://github.com/shanteacontrols/OpenDeck/wiki/Configurable-features).
 
 If the feature you want isn't supported yet, don't feel discouraged. Open up a [discussion thread](https://github.com/shanteacontrols/OpenDeck/discussions) and let's talk about it.
 
-## Official board
+## Official boards
 
-![](https://raw.githubusercontent.com/shanteacontrols/website/master/images/opendeck3-header.png)
+Currently, there are two official boards: M and L variants. "M" stands for "middle" and "L" for "large". Both boards are available on [Tindie store](https://www.tindie.com/stores/paradajz/).
 
-The official board currently comes in A and B variant: A variant is based on Arduino Nano 33 BLE with nRF52840 MCU and B variant on STM32F4 Black Pill with STM32F411 MCU. A variant supports BLE MIDI and supports few more presets due to larger flash memory - everything else is the same. The board features the following:
+### M board
+
+![](https://cdn.tindiemedia.com/images/resize/8pSVbF6aLfZEHLi4QT2-eta-3x0=/p/full-fit-in/1782x1336/i/302101/products/2022-12-27T12%3A12%3A36.249Z-IMG_5883.jpg?1672114383)
+
+This board is based on Raspberry Pi RP2040 microcontroller and features the following:
+
+* 64 digital inputs
+* 48 digital outputs
+* 32 analog inputs
+* DIN MIDI
+* USB MIDI (USB C)
+* Connector for touchscreen
+* Connector for I2C OLED display
+
+The board is available on [Tindie](https://www.tindie.com/products/paradajz/opendeck-diy-midi-platform-m/).
+
+### L board
+
+![](https://cdn.tindiemedia.com/images/resize/EA-umrsQVGdmqw7M0p83zl3f_iE=/p/full-fit-in/1782x1336/i/302101/products/2022-11-28T21%3A31%3A35.971Z-IMG_5694-removebg_res.png?1669642489)
+
+This board is based on Raspberry Pi RP2040 microcontroller and features the following:
 
 * 128 digital inputs
 * 64 digital outputs
 * 64 analog inputs
 * DIN MIDI
-* USB MIDI
-* DMX output
-* Bluetooth on A variant
+* USB MIDI (USB C)
+* Connector for touchscreen
+* Connector for I2C OLED display
+* Additional connectors with 3V+GND and 5V+GND connections
 
-The board is available on [Tindie](https://www.tindie.com/products/paradajz/opendeck-diy-midi-platform-v3/).
+The board is available on [Tindie](https://www.tindie.com/products/paradajz/opendeck-diy-midi-platform-l/).
 
 ## Supported boards
 
@@ -106,7 +125,6 @@ Most of the code is available under Apache Licence v2.0, with the following exce
   * `avr-libstdcpp`: GNU GPL v3 or later with GCC Runtime Library Exception 3.1
   * `core`: MIT
   * `dbms`: MIT
-  * `dmxusb`: MIT
   * `EmuEEPROM`: MIT
   * `lufa`: Modified MIT, see `modules/core/modules/lufa/LUFA/Licence.txt` for details
   * `midi`: MIT

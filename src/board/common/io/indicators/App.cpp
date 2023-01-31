@@ -27,7 +27,14 @@ limitations under the License.
 
 #include "Indicators.h"
 
-namespace Board::detail::IO::indicators
+namespace
+{
+    bool              _factoryResetInProgress;
+    volatile uint16_t _factoryResetIndicatorTimeout;
+    bool              _factoryResetIndicatorState;
+}    // namespace
+
+namespace board::detail::io::indicators
 {
     void init()
     {
@@ -50,13 +57,37 @@ namespace Board::detail::IO::indicators
 
     void update()
     {
-        UPDATE_USB_INDICATOR();
-        UPDATE_UART_INDICATOR();
-        UPDATE_BLE_INDICATOR();
-    }
-}    // namespace Board::detail::IO::indicators
+        using namespace board::io::indicators;
 
-namespace Board::IO::indicators
+        if (!_factoryResetInProgress)
+        {
+            UPDATE_USB_INDICATOR();
+            UPDATE_UART_INDICATOR();
+            UPDATE_BLE_INDICATOR();
+        }
+        else
+        {
+            if (++_factoryResetIndicatorTimeout == LED_FACTORY_RESET_INDICATOR_TIMEOUT)
+            {
+                _factoryResetIndicatorTimeout = 0;
+                _factoryResetIndicatorState   = !_factoryResetIndicatorState;
+
+                if (_factoryResetIndicatorState)
+                {
+                    IN_INDICATORS_ON();
+                    OUT_INDICATORS_OFF();
+                }
+                else
+                {
+                    OUT_INDICATORS_ON();
+                    IN_INDICATORS_OFF();
+                }
+            }
+        }
+    }
+}    // namespace board::detail::io::indicators
+
+namespace board::io::indicators
 {
     void indicateTraffic(source_t source, direction_t direction)
     {
@@ -84,7 +115,13 @@ namespace Board::IO::indicators
             break;
         }
     }
-}    // namespace Board::IO::indicators
+
+    void indicateFactoryReset()
+    {
+        ALL_INDICATORS_OFF();
+        _factoryResetInProgress = true;
+    }
+}    // namespace board::io::indicators
 
 #endif
 #endif

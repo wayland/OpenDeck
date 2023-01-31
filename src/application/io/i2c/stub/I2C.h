@@ -18,9 +18,9 @@ limitations under the License.
 
 #pragma once
 
-namespace IO
+namespace io
 {
-    class I2C : public IO::Base
+    class I2C : public io::Base
     {
         public:
         class Peripheral
@@ -29,10 +29,14 @@ namespace IO
             class HWA
             {
                 public:
+                virtual ~HWA() = default;
+
                 virtual bool init()                                               = 0;
                 virtual bool write(uint8_t address, uint8_t* buffer, size_t size) = 0;
                 virtual bool deviceAvailable(uint8_t address)                     = 0;
             };
+
+            virtual ~Peripheral() = default;
 
             virtual bool init()   = 0;
             virtual void update() = 0;
@@ -58,4 +62,4 @@ namespace IO
             return 0;
         }
     };
-}    // namespace IO
+}    // namespace io

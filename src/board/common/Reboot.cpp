@@ -25,35 +25,37 @@ limitations under the License.
 #include "usb-link/Commands.h"
 #endif
 
-namespace Board
+namespace board
 {
     void reboot()
     {
+        usb::deInit();
+
 #ifndef HW_SUPPORT_USB
         // signal to usb link to reboot as well
 
-        uint8_t data[2] = {
-            static_cast<uint8_t>(USBLink::internalCMD_t::REBOOT_BTLDR),
-            Board::bootloader::magicBootValue()
+        uint32_t magicVal = board::bootloader::magicBootValue();
+
+        uint8_t data[5] = {
+            static_cast<uint8_t>(usbLink::internalCMD_t::REBOOT_BTLDR),
+            static_cast<uint8_t>(magicVal >> 24 & 0xFF),
+            static_cast<uint8_t>(magicVal >> 16 & 0xFF),
+            static_cast<uint8_t>(magicVal >> 8 & 0xFF),
+            static_cast<uint8_t>(magicVal >> 0 & 0xFF),
         };
 
-        USBOverSerial::USBWritePacket packet(USBOverSerial::packetType_t::INTERNAL,
+        usbOverSerial::USBWritePacket packet(usbOverSerial::packetType_t::INTERNAL,
                                              data,
-                                             2,
+                                             sizeof(data),
                                              BUFFER_SIZE_USB_OVER_SERIAL);
-        USBOverSerial::write(HW_UART_CHANNEL_USB_LINK, packet);
-
-        while (!Board::UART::isTxComplete(HW_UART_CHANNEL_USB_LINK))
-        {
-            ;
-        }
+        usbOverSerial::write(HW_UART_CHANNEL_USB_LINK, packet);
 #endif
 
         // In case the indicator LEDs were on before this command was issued, this will make sure
         // they are off before the reboot.
         // Double the delay time to avoid "sharp" transition between traffic event and bootloader indication.
-        core::timing::waitMs(IO::indicators::LED_TRAFFIC_INDICATOR_TIMEOUT * 2);
+        core::timing::waitMs(io::indicators::LED_TRAFFIC_INDICATOR_TIMEOUT * 2);
 
         core::mcu::reset();
     }
-}    // namespace Board
+}    // namespace board

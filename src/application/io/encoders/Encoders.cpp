@@ -25,7 +25,7 @@ limitations under the License.
 #include "util/conversion/Conversion.h"
 #include "util/configurable/Configurable.h"
 
-using namespace IO;
+using namespace io;
 
 Encoders::Encoders(HWA&      hwa,
                    Filter&   filter,
@@ -36,11 +36,11 @@ Encoders::Encoders(HWA&      hwa,
     , _database(database)
     , TIME_DIFF_READOUT(timeDiffTimeout)
 {
-    MIDIDispatcher.listen(Messaging::eventType_t::MIDI_IN,
-                          [this](const Messaging::event_t& event)
+    MIDIDispatcher.listen(messaging::eventType_t::MIDI_IN,
+                          [this](const messaging::event_t& event)
                           {
-                              const uint8_t GLOBAL_CHANNEL = _database.read(Database::Config::Section::global_t::MIDI_SETTINGS, MIDI::setting_t::GLOBAL_CHANNEL);
-                              const uint8_t CHANNEL        = _database.read(Database::Config::Section::global_t::MIDI_SETTINGS,
+                              const uint8_t GLOBAL_CHANNEL = _database.read(database::Config::Section::global_t::MIDI_SETTINGS, MIDI::setting_t::GLOBAL_CHANNEL);
+                              const uint8_t CHANNEL        = _database.read(database::Config::Section::global_t::MIDI_SETTINGS,
                                                                      MIDI::setting_t::USE_GLOBAL_CHANNEL)
                                                                  ? GLOBAL_CHANNEL
                                                                  : event.channel;
@@ -51,27 +51,27 @@ Encoders::Encoders(HWA&      hwa,
                               {
                               case MIDI::messageType_t::CONTROL_CHANGE:
                               {
-                                  for (size_t i = 0; i < Collection::size(); i++)
+                                  for (size_t i = 0; i < Collection::SIZE(); i++)
                                   {
-                                      if (!_database.read(Database::Config::Section::encoder_t::REMOTE_SYNC, i))
+                                      if (!_database.read(database::Config::Section::encoder_t::REMOTE_SYNC, i))
                                       {
                                           continue;
                                       }
 
-                                      if (_database.read(Database::Config::Section::encoder_t::MODE, i) != static_cast<int32_t>(IO::Encoders::type_t::CONTROL_CHANGE))
+                                      if (_database.read(database::Config::Section::encoder_t::MODE, i) != static_cast<int32_t>(io::Encoders::type_t::CONTROL_CHANGE))
                                       {
                                           continue;
                                       }
 
                                       if (!USE_OMNI)
                                       {
-                                          if (_database.read(Database::Config::Section::encoder_t::CHANNEL, i) != CHANNEL)
+                                          if (_database.read(database::Config::Section::encoder_t::CHANNEL, i) != CHANNEL)
                                           {
                                               continue;
                                           }
                                       }
 
-                                      if (_database.read(Database::Config::Section::encoder_t::MIDI_ID, i) != event.index)
+                                      if (_database.read(database::Config::Section::encoder_t::MIDI_ID, i) != event.index)
                                       {
                                           continue;
                                       }
@@ -87,23 +87,23 @@ Encoders::Encoders(HWA&      hwa,
                           });
 
     ConfigHandler.registerConfig(
-        System::Config::block_t::ENCODERS,
+        sys::Config::block_t::ENCODERS,
         // read
         [this](uint8_t section, size_t index, uint16_t& value)
         {
-            return sysConfigGet(static_cast<System::Config::Section::encoder_t>(section), index, value);
+            return sysConfigGet(static_cast<sys::Config::Section::encoder_t>(section), index, value);
         },
 
         // write
         [this](uint8_t section, size_t index, uint16_t value)
         {
-            return sysConfigSet(static_cast<System::Config::Section::encoder_t>(section), index, value);
+            return sysConfigSet(static_cast<sys::Config::Section::encoder_t>(section), index, value);
         });
 }
 
 bool Encoders::init()
 {
-    for (size_t i = 0; i < Collection::size(); i++)
+    for (size_t i = 0; i < Collection::SIZE(); i++)
     {
         reset(i);
     }
@@ -118,7 +118,7 @@ void Encoders::updateSingle(size_t index, bool forceRefresh)
         return;
     }
 
-    if (!_database.read(Database::Config::Section::encoder_t::ENABLE, index))
+    if (!_database.read(database::Config::Section::encoder_t::ENABLE, index))
     {
         return;
     }
@@ -152,7 +152,7 @@ void Encoders::updateSingle(size_t index, bool forceRefresh)
 
 void Encoders::updateAll(bool forceRefresh)
 {
-    for (size_t i = 0; i < Collection::size(); i++)
+    for (size_t i = 0; i < Collection::SIZE(); i++)
     {
         updateSingle(i, forceRefresh);
     }
@@ -160,7 +160,7 @@ void Encoders::updateAll(bool forceRefresh)
 
 size_t Encoders::maxComponentUpdateIndex()
 {
-    return Collection::size();
+    return Collection::SIZE();
 }
 
 void Encoders::processReading(size_t index, uint8_t pairValue, uint32_t sampleTime)
@@ -171,7 +171,7 @@ void Encoders::processReading(size_t index, uint8_t pairValue, uint32_t sampleTi
     {
         if (encoderState != position_t::STOPPED)
         {
-            if (_database.read(Database::Config::Section::encoder_t::INVERT, index))
+            if (_database.read(database::Config::Section::encoder_t::INVERT, index))
             {
                 if (encoderState == position_t::CCW)
                 {
@@ -183,7 +183,7 @@ void Encoders::processReading(size_t index, uint8_t pairValue, uint32_t sampleTi
                 }
             }
 
-            uint8_t encAcceleration = _database.read(Database::Config::Section::encoder_t::ACCELERATION, index);
+            uint8_t encAcceleration = _database.read(database::Config::Section::encoder_t::ACCELERATION, index);
 
             if (encAcceleration)
             {
@@ -211,7 +211,7 @@ void Encoders::processReading(size_t index, uint8_t pairValue, uint32_t sampleTi
 
 void Encoders::sendMessage(size_t index, position_t encoderState, encoderDescriptor_t& descriptor)
 {
-    auto    eventType = Messaging::eventType_t::ENCODER;
+    auto    eventType = messaging::eventType_t::ENCODER;
     bool    send      = true;
     uint8_t steps     = (_encoderSpeed[index] > 0) ? _encoderSpeed[index] : 1;
 
@@ -250,7 +250,6 @@ void Encoders::sendMessage(size_t index, position_t encoderState, encoderDescrip
     case type_t::NRPN_7BIT:
     case type_t::NRPN_14BIT:
     case type_t::CONTROL_CHANGE_14BIT:
-    case type_t::DMX:
     {
         const bool USE_14BIT =
             ((descriptor.type == type_t::PITCH_BEND) || (descriptor.type == type_t::NRPN_14BIT) || (descriptor.type == type_t::CONTROL_CHANGE_14BIT));
@@ -271,14 +270,6 @@ void Encoders::sendMessage(size_t index, position_t encoderState, encoderDescrip
         {
             switch (descriptor.type)
             {
-            case type_t::DMX:
-            {
-                _value[index] = ValueIncDecDMX::increment(_value[index],
-                                                          steps,
-                                                          ValueIncDecDMX::type_t::EDGE);
-            }
-            break;
-
             case type_t::CONTROL_CHANGE:
             case type_t::NRPN_7BIT:
             {
@@ -303,12 +294,7 @@ void Encoders::sendMessage(size_t index, position_t encoderState, encoderDescrip
             }
         }
 
-        if (descriptor.type == type_t::DMX)
-        {
-            eventType              = Messaging::eventType_t::DMX_ENCODER;
-            descriptor.event.index = 0;    // irrelevant
-        }
-        else if (descriptor.type == type_t::CONTROL_CHANGE_14BIT)
+        if (descriptor.type == type_t::CONTROL_CHANGE_14BIT)
         {
             if (descriptor.event.index >= 96)
             {
@@ -323,10 +309,10 @@ void Encoders::sendMessage(size_t index, position_t encoderState, encoderDescrip
 
     case type_t::PRESET_CHANGE:
     {
-        eventType                      = Messaging::eventType_t::SYSTEM;
+        eventType                      = messaging::eventType_t::SYSTEM;
         descriptor.event.systemMessage = (encoderState == position_t::CW)
-                                             ? Messaging::systemMessage_t::PRESET_CHANGE_INC_REQ
-                                             : Messaging::systemMessage_t::PRESET_CHANGE_DEC_REQ;
+                                             ? messaging::systemMessage_t::PRESET_CHANGE_INC_REQ
+                                             : messaging::systemMessage_t::PRESET_CHANGE_DEC_REQ;
     }
     break;
 
@@ -346,7 +332,7 @@ void Encoders::sendMessage(size_t index, position_t encoderState, encoderDescrip
 /// Sets the MIDI value of specified encoder to default.
 void Encoders::reset(size_t index)
 {
-    if (_database.read(Database::Config::Section::encoder_t::MODE, index) == static_cast<int32_t>(type_t::PITCH_BEND))
+    if (_database.read(database::Config::Section::encoder_t::MODE, index) == static_cast<int32_t>(type_t::PITCH_BEND))
     {
         _value[index] = 8192;
     }
@@ -396,7 +382,7 @@ Encoders::position_t Encoders::read(size_t index, uint8_t pairState)
 
     _encoderPulses[index] += ENCODER_LOOK_UP_TABLE[_encoderData[index] & 0x0F];
 
-    if (abs(_encoderPulses[index]) >= _database.read(Database::Config::Section::encoder_t::PULSES_PER_STEP, index))
+    if (abs(_encoderPulses[index]) >= static_cast<int32_t>(_database.read(database::Config::Section::encoder_t::PULSES_PER_STEP, index)))
     {
         retVal = (_encoderPulses[index] > 0) ? position_t::CCW : position_t::CW;
         // reset count
@@ -408,23 +394,26 @@ Encoders::position_t Encoders::read(size_t index, uint8_t pairState)
 
 void Encoders::fillEncoderDescriptor(size_t index, encoderDescriptor_t& descriptor)
 {
-    descriptor.type                 = static_cast<type_t>(_database.read(Database::Config::Section::encoder_t::MODE, index));
+    descriptor.type                 = static_cast<type_t>(_database.read(database::Config::Section::encoder_t::MODE, index));
     descriptor.event.componentIndex = index;
-    descriptor.event.channel        = _database.read(Database::Config::Section::encoder_t::CHANNEL, index);
-    descriptor.event.index          = _database.read(Database::Config::Section::encoder_t::MIDI_ID, index);
+    descriptor.event.channel        = _database.read(database::Config::Section::encoder_t::CHANNEL, index);
+    descriptor.event.index          = _database.read(database::Config::Section::encoder_t::MIDI_ID, index);
     descriptor.event.message        = INTERNAL_MSG_TO_MIDI_TYPE[static_cast<uint8_t>(descriptor.type)];
 }
 
-std::optional<uint8_t> Encoders::sysConfigGet(System::Config::Section::encoder_t section, size_t index, uint16_t& value)
+std::optional<uint8_t> Encoders::sysConfigGet(sys::Config::Section::encoder_t section, size_t index, uint16_t& value)
 {
-    int32_t readValue;
-    auto    result = _database.read(Util::Conversion::sys2DBsection(section), index, readValue) ? System::Config::status_t::ACK : System::Config::status_t::ERROR_READ;
+    uint32_t readValue;
 
-    if (result == System::Config::status_t::ACK)
+    auto result = _database.read(util::Conversion::SYS_2_DB_SECTION(section), index, readValue)
+                      ? sys::Config::status_t::ACK
+                      : sys::Config::status_t::ERROR_READ;
+
+    if (result == sys::Config::status_t::ACK)
     {
-        if (section == System::Config::Section::encoder_t::MIDI_ID_MSB)
+        if (section == sys::Config::Section::encoder_t::MIDI_ID_MSB)
         {
-            return System::Config::status_t::ERROR_NOT_SUPPORTED;
+            return sys::Config::status_t::ERROR_NOT_SUPPORTED;
         }
     }
 
@@ -433,20 +422,22 @@ std::optional<uint8_t> Encoders::sysConfigGet(System::Config::Section::encoder_t
     return result;
 }
 
-std::optional<uint8_t> Encoders::sysConfigSet(System::Config::Section::encoder_t section, size_t index, uint16_t value)
+std::optional<uint8_t> Encoders::sysConfigSet(sys::Config::Section::encoder_t section, size_t index, uint16_t value)
 {
     switch (section)
     {
-    case System::Config::Section::encoder_t::MIDI_ID_MSB:
-        return System::Config::status_t::ERROR_NOT_SUPPORTED;
+    case sys::Config::Section::encoder_t::MIDI_ID_MSB:
+        return sys::Config::status_t::ERROR_NOT_SUPPORTED;
 
     default:
         break;
     }
 
-    auto result = _database.update(Util::Conversion::sys2DBsection(section), index, value) ? System::Config::status_t::ACK : System::Config::status_t::ERROR_WRITE;
+    auto result = _database.update(util::Conversion::SYS_2_DB_SECTION(section), index, value)
+                      ? sys::Config::status_t::ACK
+                      : sys::Config::status_t::ERROR_WRITE;
 
-    if (result == System::Config::status_t::ACK)
+    if (result == sys::Config::status_t::ACK)
     {
         reset(index);
     }

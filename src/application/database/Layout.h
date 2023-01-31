@@ -25,12 +25,11 @@ limitations under the License.
 #include "io/leds/LEDs.h"
 #include "io/i2c/peripherals/display/Display.h"
 #include "io/touchscreen/Touchscreen.h"
-#include "protocol/dmx/DMX.h"
 #include "protocol/midi/MIDI.h"
 
-namespace Database
+namespace database
 {
-    class AppLayout : public Database::Admin::Layout
+    class AppLayout : public database::Admin::Layout
     {
         public:
         AppLayout() = default;
@@ -61,7 +60,7 @@ namespace Database
 
             // presets
             {
-                static_cast<uint8_t>(Database::Config::presetSetting_t::AMOUNT),
+                static_cast<uint8_t>(database::Config::presetSetting_t::AMOUNT),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -72,16 +71,7 @@ namespace Database
         std::vector<LESSDB::Section> _globalSections = {
             // midi settings section
             {
-                static_cast<uint8_t>(Protocol::MIDI::setting_t::AMOUNT),
-                LESSDB::sectionParameterType_t::BYTE,
-                LESSDB::preserveSetting_t::DISABLE,
-                LESSDB::autoIncrementSetting_t::DISABLE,
-                0,
-            },
-
-            // dmx section
-            {
-                static_cast<uint8_t>(Protocol::DMX::setting_t::AMOUNT),
+                static_cast<uint8_t>(protocol::MIDI::setting_t::AMOUNT),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -92,7 +82,7 @@ namespace Database
         std::vector<LESSDB::Section> _buttonSections = {
             // type section
             {
-                IO::Buttons::Collection::size(),
+                io::Buttons::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BIT,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -101,7 +91,7 @@ namespace Database
 
             // message type section
             {
-                IO::Buttons::Collection::size(),
+                io::Buttons::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -110,7 +100,7 @@ namespace Database
 
             // midi id section
             {
-                IO::Buttons::Collection::size(),
+                io::Buttons::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -119,7 +109,7 @@ namespace Database
 
             // value section
             {
-                IO::Buttons::Collection::size(),
+                io::Buttons::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -128,8 +118,8 @@ namespace Database
 
             // channel section
             {
-                IO::Buttons::Collection::size(),
-                LESSDB::sectionParameterType_t::WORD,
+                io::Buttons::Collection::SIZE(),
+                LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
                 1,
@@ -139,7 +129,7 @@ namespace Database
         std::vector<LESSDB::Section> _encoderSections = {
             // encoder enabled section
             {
-                IO::Encoders::Collection::size(),
+                io::Encoders::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BIT,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -148,7 +138,7 @@ namespace Database
 
             // encoder inverted section
             {
-                IO::Encoders::Collection::size(),
+                io::Encoders::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BIT,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -157,7 +147,7 @@ namespace Database
 
             // encoding mode section
             {
-                IO::Encoders::Collection::size(),
+                io::Encoders::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::HALF_BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -166,7 +156,7 @@ namespace Database
 
             // midi id section
             {
-                IO::Encoders::Collection::size(),
+                io::Encoders::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::WORD,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::ENABLE,
@@ -175,8 +165,8 @@ namespace Database
 
             // channel section
             {
-                IO::Encoders::Collection::size(),
-                LESSDB::sectionParameterType_t::WORD,
+                io::Encoders::Collection::SIZE(),
+                LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
                 1,
@@ -184,7 +174,7 @@ namespace Database
 
             // pulses per step section
             {
-                IO::Encoders::Collection::size(),
+                io::Encoders::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::HALF_BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -193,7 +183,7 @@ namespace Database
 
             // acceleration section
             {
-                IO::Encoders::Collection::size(),
+                io::Encoders::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::HALF_BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -202,7 +192,7 @@ namespace Database
 
             // remote sync section
             {
-                IO::Encoders::Collection::size(),
+                io::Encoders::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BIT,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -213,7 +203,7 @@ namespace Database
         std::vector<LESSDB::Section> _analogSections = {
             // analog enabled section
             {
-                IO::Analog::Collection::size(),
+                io::Analog::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BIT,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -222,7 +212,7 @@ namespace Database
 
             // analog inverted section
             {
-                IO::Analog::Collection::size(),
+                io::Analog::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BIT,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -231,7 +221,7 @@ namespace Database
 
             // analog type section
             {
-                IO::Analog::Collection::size(),
+                io::Analog::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::HALF_BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -240,7 +230,7 @@ namespace Database
 
             // midi id section
             {
-                IO::Analog::Collection::size(),
+                io::Analog::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::WORD,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::ENABLE,
@@ -249,7 +239,7 @@ namespace Database
 
             // lower value limit
             {
-                IO::Analog::Collection::size(),
+                io::Analog::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::WORD,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -258,7 +248,7 @@ namespace Database
 
             // upper value limit
             {
-                IO::Analog::Collection::size(),
+                io::Analog::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::WORD,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -267,8 +257,8 @@ namespace Database
 
             // channel section
             {
-                IO::Analog::Collection::size(),
-                LESSDB::sectionParameterType_t::WORD,
+                io::Analog::Collection::SIZE(),
+                LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
                 1,
@@ -276,7 +266,7 @@ namespace Database
 
             // lower adc percentage offset
             {
-                IO::Analog::Collection::size(),
+                io::Analog::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -285,7 +275,7 @@ namespace Database
 
             // upper adc percentage offset
             {
-                IO::Analog::Collection::size(),
+                io::Analog::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -296,7 +286,7 @@ namespace Database
         std::vector<LESSDB::Section> _ledSections = {
             // global parameters section
             {
-                static_cast<size_t>(IO::LEDs::setting_t::AMOUNT),
+                static_cast<size_t>(io::LEDs::setting_t::AMOUNT),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -305,7 +295,7 @@ namespace Database
 
             // activation id section
             {
-                IO::LEDs::Collection::size(),
+                io::LEDs::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -314,7 +304,7 @@ namespace Database
 
             // rgb enabled section
             {
-                (IO::LEDs::Collection::size() / 3) + (IO::Touchscreen::Collection::size() / 3),
+                (io::LEDs::Collection::SIZE() / 3) + (io::Touchscreen::Collection::SIZE() / 3),
                 LESSDB::sectionParameterType_t::BIT,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -323,7 +313,7 @@ namespace Database
 
             // led control type section
             {
-                IO::LEDs::Collection::size(),
+                io::LEDs::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::HALF_BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -332,7 +322,7 @@ namespace Database
 
             // single velocity value section
             {
-                IO::LEDs::Collection::size(),
+                io::LEDs::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -341,8 +331,8 @@ namespace Database
 
             // channel section
             {
-                IO::LEDs::Collection::size(),
-                LESSDB::sectionParameterType_t::WORD,
+                io::LEDs::Collection::SIZE(),
+                LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
                 1,
@@ -352,7 +342,7 @@ namespace Database
         std::vector<LESSDB::Section> _i2cSections = {
             // display section
             {
-                static_cast<uint8_t>(IO::Display::setting_t::AMOUNT),
+                static_cast<uint8_t>(io::Display::setting_t::AMOUNT),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -363,7 +353,7 @@ namespace Database
         std::vector<LESSDB::Section> _touchscreenSections = {
             // setting section
             {
-                static_cast<uint8_t>(IO::Touchscreen::setting_t::AMOUNT),
+                static_cast<uint8_t>(io::Touchscreen::setting_t::AMOUNT),
                 LESSDB::sectionParameterType_t::BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -372,7 +362,7 @@ namespace Database
 
             // x position section
             {
-                IO::Touchscreen::Collection::size(),
+                io::Touchscreen::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::WORD,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -381,7 +371,7 @@ namespace Database
 
             // y position section
             {
-                IO::Touchscreen::Collection::size(),
+                io::Touchscreen::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::WORD,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -390,7 +380,7 @@ namespace Database
 
             // width section
             {
-                IO::Touchscreen::Collection::size(),
+                io::Touchscreen::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::WORD,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -399,7 +389,7 @@ namespace Database
 
             // height section
             {
-                IO::Touchscreen::Collection::size(),
+                io::Touchscreen::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::WORD,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -408,7 +398,7 @@ namespace Database
 
             // on screen section
             {
-                IO::Touchscreen::Collection::size(),
+                io::Touchscreen::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::HALF_BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -417,7 +407,7 @@ namespace Database
 
             // off screen section
             {
-                IO::Touchscreen::Collection::size(),
+                io::Touchscreen::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::HALF_BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -426,7 +416,7 @@ namespace Database
 
             // page switch enabled section
             {
-                IO::Touchscreen::Collection::size(),
+                io::Touchscreen::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::BIT,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -435,7 +425,7 @@ namespace Database
 
             // page switch index section
             {
-                IO::Touchscreen::Collection::size(),
+                io::Touchscreen::Collection::SIZE(),
                 LESSDB::sectionParameterType_t::HALF_BYTE,
                 LESSDB::preserveSetting_t::DISABLE,
                 LESSDB::autoIncrementSetting_t::DISABLE,
@@ -487,4 +477,4 @@ namespace Database
             },
         };
     };
-}    // namespace Database
+}    // namespace database

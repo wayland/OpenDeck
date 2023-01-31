@@ -28,9 +28,9 @@ limitations under the License.
 #include "core/src/util/RingBuffer.h"
 #include <Target.h>
 
-using namespace Board::IO::digitalIn;
-using namespace Board::detail;
-using namespace Board::detail::IO::digitalIn;
+using namespace board::io::digitalIn;
+using namespace board::detail;
+using namespace board::detail::io::digitalIn;
 
 namespace
 {
@@ -60,7 +60,7 @@ namespace
             for (uint8_t row = 0; row < HW_NR_OF_BUTTON_ROWS; row++)
             {
                 size_t index = (row * HW_NR_OF_BUTTON_COLUMNS) + column;
-                pin          = map::buttonPin(row);
+                pin          = map::BUTTON_PIN(row);
 
                 _digitalInBuffer[index].readings <<= 1;
                 _digitalInBuffer[index].readings |= !CORE_MCU_IO_READ(pin.port, pin.index);
@@ -74,13 +74,13 @@ namespace
     }
 }    // namespace
 
-namespace Board::detail::IO::digitalIn
+namespace board::detail::io::digitalIn
 {
     void init()
     {
         for (uint8_t i = 0; i < HW_NR_OF_BUTTON_ROWS; i++)
         {
-            auto pin = detail::map::buttonPin(i);
+            auto pin = detail::map::BUTTON_PIN(i);
 
 #ifndef HW_BUTTONS_EXT_PULLUPS
             CORE_MCU_IO_INIT(pin.port, pin.index, core::mcu::io::pinMode_t::INPUT, core::mcu::io::pullMode_t::UP);
@@ -108,9 +108,9 @@ namespace Board::detail::IO::digitalIn
         CORE_MCU_IO_SET_LOW(PIN_PORT_DEC_BM_A1, PIN_INDEX_DEC_BM_A1);
         CORE_MCU_IO_SET_LOW(PIN_PORT_DEC_BM_A2, PIN_INDEX_DEC_BM_A2);
     }
-}    // namespace Board::detail::IO::digitalIn
+}    // namespace board::detail::io::digitalIn
 
-namespace Board::IO::digitalIn
+namespace board::io::digitalIn
 {
     bool state(size_t index, readings_t& readings)
     {
@@ -119,7 +119,7 @@ namespace Board::IO::digitalIn
             return false;
         }
 
-        index = map::buttonIndex(index);
+        index = map::BUTTON_INDEX(index);
 
         CORE_MCU_ATOMIC_SECTION
         {
@@ -157,7 +157,7 @@ namespace Board::IO::digitalIn
 
         return index + HW_NR_OF_BUTTON_COLUMNS;
     }
-}    // namespace Board::IO::digitalIn
+}    // namespace board::io::digitalIn
 
 #include "Common.cpp.include"
 

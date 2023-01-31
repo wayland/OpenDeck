@@ -22,7 +22,7 @@ limitations under the License.
 #include <inttypes.h>
 #include <array>
 
-namespace Board
+namespace board
 {
     enum class initStatus_t : uint8_t
     {
@@ -40,7 +40,7 @@ namespace Board
     /// Used to continuously perform board-specific tasks if needed.
     void update();
 
-    namespace USB
+    namespace usb
     {
         using midiPacket_t = std::array<uint8_t, 4>;
 
@@ -48,6 +48,12 @@ namespace Board
         /// Note: explicit call needed only for application.
         /// For bootloader, USB is initialized automatically once runBootloader is called.
         initStatus_t init();
+
+        /// Checks if the USB interface has been initialized.
+        bool isInitialized();
+
+        /// Shuts down USB connection to host.
+        void deInit();
 
         /// Checks if USB has been enumerated on host machine.
         bool isUSBconnected();
@@ -89,75 +95,17 @@ namespace Board
         /// Should be overriden by user application for proper functionality.
         /// param [in]: baudRate    Baudrate value specified in USB request.
         void onCDCsetLineEncoding(uint32_t baudRate);
-    }    // namespace USB
+    }    // namespace usb
 
-    namespace UART
+    namespace uart
     {
-        using dmxBuffer_t = std::array<uint8_t, 513>;
-
-        enum parity_t : uint8_t
-        {
-            NO,
-            EVEN,
-            ODD
-        };
-
-        enum stopBits_t : uint8_t
-        {
-            ONE,
-            TWO
-        };
-
-        enum type_t : uint8_t
-        {
-            RX_TX,
-            RX,
-            TX
-        };
-
-        struct config_t
-        {
-            uint32_t     baudRate  = 9600;
-            parity_t     parity    = parity_t::NO;
-            stopBits_t   stopBits  = stopBits_t::ONE;
-            type_t       type      = type_t::RX_TX;
-            bool         dmxMode   = false;
-            dmxBuffer_t* dmxBuffer = nullptr;
-
-            config_t(uint32_t     baudRate,
-                     parity_t     parity,
-                     stopBits_t   stopBits,
-                     type_t       type,
-                     bool         dmxMode,
-                     dmxBuffer_t& dmxBuffer)
-                : baudRate(baudRate)
-                , parity(parity)
-                , stopBits(stopBits)
-                , type(type)
-                , dmxMode(dmxMode)
-                , dmxBuffer(&dmxBuffer)
-            {}
-
-            config_t(uint32_t   baudRate,
-                     parity_t   parity,
-                     stopBits_t stopBits,
-                     type_t     type)
-                : baudRate(baudRate)
-                , parity(parity)
-                , stopBits(stopBits)
-                , type(type)
-            {}
-
-            config_t() = default;
-        };
-
         /// Initializes UART peripheral.
         /// param [in]: channel     UART channel on MCU.
-        /// param [in]: config      Structure containing configuration for given UART channel.
+        /// param [in]: baudRate    Baud rate for specified channel.
         /// param [in]: force       Forces the enabling of UART channel
         ///                         even if UART is already enabled.
         /// returns: see initStatus_t.
-        initStatus_t init(uint8_t channel, config_t& config, bool force = false);
+        initStatus_t init(uint8_t channel, uint32_t baudRate, bool force = false);
 
         /// Deinitializes specified UART channel.
         /// param [in]: channel UART channel on MCU.
@@ -201,18 +149,9 @@ namespace Board
         /// param [in]: channel UART channel on MCU.
         /// param [in]: state   New state of loopback functionality (true/enabled, false/disabled).
         void setLoopbackState(uint8_t channel, bool state);
+    }    // namespace uart
 
-        /// Checks if all data on specified UART channel has been sent.
-        /// param [in]: channel UART channel on MCU.
-        /// returns: True if there is no more data to transmit, false otherwise.
-        bool isTxComplete(uint8_t channel);
-
-        /// Used to change DMX buffer from which values will be read.
-        /// returns: True if the buffer is valid (non-nullptr), false otherwise.
-        bool updateDmxBuffer(dmxBuffer_t& buffer);
-    }    // namespace UART
-
-    namespace I2C
+    namespace i2c
     {
         enum class clockSpeed_t : uint32_t
         {
@@ -248,9 +187,9 @@ namespace Board
         /// param [in]: address     7-bit slave address without R/W bit.
         /// returns: True if device is present, false otherwise.
         bool deviceAvailable(uint8_t channel, uint8_t address);
-    }    // namespace I2C
+    }    // namespace i2c
 
-    namespace IO
+    namespace io
     {
         void init();
 
@@ -356,6 +295,10 @@ namespace Board
             /// Blinking starts once indicateFirmwareUpdateStart() is called.
             constexpr inline uint32_t LED_DFU_INDICATOR_TIMEOUT = 500;
 
+            /// Blinking time in milliseconds for indicator LEDs to indicate that the factory reset is in progress.
+            /// Blinking starts once indicateFactoryReset() is called.
+            constexpr inline uint32_t LED_FACTORY_RESET_INDICATOR_TIMEOUT = 250;
+
             /// Used to indicate that the data event (UART, USB etc.) has occured using built-in LEDs on board.
             /// param [source]      Source of data. Depending on the source corresponding LEDs will be turned on.
             /// param [direction]   Direction of data.
@@ -364,10 +307,14 @@ namespace Board
             /// Used to indicate that the firmware update is in progress.
             /// This will blink all the internal LEDs continuously until update is done.
             void indicateFirmwareUpdateStart();
-        }    // namespace indicators
-    }        // namespace IO
 
-    namespace NVM
+            /// Used to indicate that factory reset is in progress.
+            /// This will turn on input indicators first and then output ones continuously until factory reset is done.
+            void indicateFactoryReset();
+        }    // namespace indicators
+    }        // namespace io
+
+    namespace nvm
     {
         // NVM: non-volatile memory
 
@@ -394,17 +341,24 @@ namespace Board
         /// param [in]: value   Reference to variable in which read value is being stored.
         /// param [in]: type    Type of parameter which is being read.
         /// returns: True on success, false otherwise.
-        bool read(uint32_t address, int32_t& value, parameterType_t type);
+        bool read(uint32_t address, uint32_t& value, parameterType_t type);
 
         /// Used to write value to memory provided by specific board.
-        /// param [in]: address Memory address in which new value is being written.
-        /// param [in]: value   Value to write.
-        /// param [in]: type    Type of parameter which is being written.
+        /// param [in]: address     Memory address in which new value is being written.
+        /// param [in]: value       Value to write.
+        /// param [in]: type        Type of parameter which is being written.
+        /// param [in]: cacheOnly   If set to true, data will be written only to in-memory cache,
+        ///                         without writing to flash, but only if supported by target.
+        ///                         Otherwise the argument will be ignored.
         /// returns: True on success, false otherwise.
-        bool write(uint32_t address, int32_t value, parameterType_t type);
-    }    // namespace NVM
+        bool write(uint32_t address, uint32_t value, parameterType_t type, bool cacheOnly = false);
 
-    namespace BLE
+        /// Used to write the contents of cache memory to flash.
+        /// Should be used only if write was called with cacheOnly argument set to true.
+        void writeCacheToFlash();
+    }    // namespace nvm
+
+    namespace ble
     {
         /// Initializes and prepares BLE stack on board as well as all registered services.
         // Advertising will be started as well.
@@ -416,7 +370,7 @@ namespace Board
         /// Checks if the device is connected to a central.
         bool isConnected();
 
-        namespace MIDI
+        namespace midi
         {
             /// Used to read MIDI data from BLE interface.
             /// param [in]: buffer  Pointer to array in which read data will be stored if available.
@@ -430,13 +384,13 @@ namespace Board
             /// param [in]: size    Amount of bytes in provided buffer.
             /// returns: True if transfer has succeded, false otherwise.
             bool write(uint8_t* buffer, size_t size);
-        }    // namespace MIDI
-    }        // namespace BLE
+        }    // namespace midi
+    }        // namespace ble
 
     namespace bootloader
     {
-        uint8_t  magicBootValue();
-        void     setMagicBootValue(uint8_t value);
+        uint32_t magicBootValue();
+        void     setMagicBootValue(uint32_t value);
         void     runBootloader();
         void     runApplication();
         void     appAddrBoundary(uint32_t& first, uint32_t& last);
@@ -450,4 +404,4 @@ namespace Board
         uint8_t readFlash(uint32_t address);
 #endif
     }    // namespace bootloader
-};       // namespace Board
+};       // namespace board

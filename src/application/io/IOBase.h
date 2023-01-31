@@ -21,7 +21,7 @@ limitations under the License.
 #include <inttypes.h>
 #include <stddef.h>
 
-namespace IO
+namespace io
 {
     enum class ioComponent_t : uint8_t
     {
@@ -37,9 +37,11 @@ namespace IO
     class Base
     {
         public:
+        virtual ~Base() = default;
+
         virtual bool   init()                                                = 0;
         virtual void   updateSingle(size_t index, bool forceRefresh = false) = 0;
         virtual void   updateAll(bool forceRefresh = false)                  = 0;
         virtual size_t maxComponentUpdateIndex()                             = 0;
     };
-}    // namespace IO
+}    // namespace io

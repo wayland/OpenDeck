@@ -20,7 +20,7 @@ limitations under the License.
 #include "core/src/MCU.h"
 #include <avr/eeprom.h>
 
-namespace Board::NVM
+namespace board::nvm
 {
     bool init()
     {
@@ -30,11 +30,11 @@ namespace Board::NVM
 
     uint32_t size()
     {
-        // last eeprom address stores type of firmware to boot once in bootloader
-        return CORE_MCU_EEPROM_SIZE - 1;
+        // last 4 bytes in eeprom are reserved for the type of firmware to boot once in bootloader
+        return CORE_MCU_EEPROM_SIZE - 4;
     }
 
-    bool read(uint32_t address, int32_t& value, parameterType_t type)
+    bool read(uint32_t address, uint32_t& value, parameterType_t type)
     {
         switch (type)
         {
@@ -60,7 +60,7 @@ namespace Board::NVM
         return true;
     }
 
-    bool write(uint32_t address, int32_t value, parameterType_t type)
+    bool write(uint32_t address, uint32_t value, parameterType_t type, bool cacheOnly)
     {
         switch (type)
         {
@@ -95,4 +95,8 @@ namespace Board::NVM
 
         return true;
     }
-}    // namespace Board::NVM
+
+    void writeCacheToFlash()
+    {
+    }
+}    // namespace board::nvm

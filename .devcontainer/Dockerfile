@@ -30,6 +30,7 @@ software-properties-common \
 python3-pip \
 gcc-multilib \
 gpg-agent \
+curl \
 && rm -rf /var/lib/apt/lists/*
 
 RUN \
@@ -87,7 +88,7 @@ cd /opt && \
 wget ${WGET_ARGS} https://github.com/facebook/infer/releases/download/v1.1.0/infer-linux64-v1.1.0.tar.xz && \
 tar -xf infer-linux64-v1.1.0.tar.xz && \
 rm infer-linux64-v1.1.0.tar.xz && \
-cp /lib/clang/15.0.0/lib/linux/libclang_rt.profile-x86_64.a /opt/infer-linux64-v1.1.0/lib/infer/facebook-clang-plugins/clang/install/lib/clang/11.1.0/lib/linux
+cp $(find /lib/clang -mindepth 1 -maxdepth 1 -type d | sort -r | head -1)/lib/linux/libclang_rt.profile-x86_64.a /opt/infer-linux64-v1.1.0/lib/infer/facebook-clang-plugins/clang/install/lib/clang/11.1.0/lib/linux
 
 ENV PATH="/opt/infer-linux64-v1.1.0/bin:/opendeck-deps/arduino-1.8.19/hardware/tools/avr/bin:/opendeck-deps/gcc-arm-none-eabi-10.3-2021.10/bin:$PATH"
 
@@ -139,3 +140,6 @@ RUN \
 sudo update-alternatives --install /usr/local/bin/clang-format clang-format /usr/bin/clang-format-15 20 && \
 sudo update-alternatives --install /usr/local/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-15 20 && \
 sudo update-alternatives --install /usr/local/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-15 20
+
+ADD .devcontainer/.git_branch_bash /home/$user/.git_branch_bash
+RUN echo "source ~/.git_branch_bash" >> ~/.bashrc

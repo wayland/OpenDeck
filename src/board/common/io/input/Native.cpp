@@ -28,9 +28,9 @@ limitations under the License.
 #include "core/src/util/RingBuffer.h"
 #include <Target.h>
 
-using namespace Board::IO::digitalIn;
-using namespace Board::detail;
-using namespace Board::detail::IO::digitalIn;
+using namespace board::io::digitalIn;
+using namespace board::detail;
+using namespace board::detail::io::digitalIn;
 
 namespace
 {
@@ -42,7 +42,7 @@ namespace
         // read all input ports instead of reading pin by pin to reduce the time spent in ISR
         for (uint8_t portIndex = 0; portIndex < HW_NR_OF_DIGITAL_INPUT_PORTS; portIndex++)
         {
-            _portBuffer[portIndex].insert(CORE_MCU_IO_READ_IN_PORT(map::digitalInPort(portIndex)));
+            _portBuffer[portIndex].insert(CORE_MCU_IO_READ_IN_PORT(map::DIGITAL_IN_PORT(portIndex)));
         }
     }
 
@@ -51,17 +51,17 @@ namespace
         // for provided button index, retrieve its port index
         // upon reading update all buttons located on that port
 
-        auto                       portIndex = map::buttonPortIndex(digitalInIndex);
+        auto                       portIndex = map::BUTTON_PORT_INDEX(digitalInIndex);
         core::mcu::io::portWidth_t portValue = 0;
 
         while (_portBuffer[portIndex].remove(portValue))
         {
             for (size_t i = 0; i < HW_MAX_NR_OF_DIGITAL_INPUTS; i++)
             {
-                if (map::buttonPortIndex(i) == portIndex)
+                if (map::BUTTON_PORT_INDEX(i) == portIndex)
                 {
                     _digitalInBuffer[i].readings <<= 1;
-                    _digitalInBuffer[i].readings |= !core::util::BIT_READ(portValue, map::buttonPinIndex(i));
+                    _digitalInBuffer[i].readings |= !core::util::BIT_READ(portValue, map::BUTTON_PIN_INDEX(i));
 
                     if (++_digitalInBuffer[i].count > MAX_READING_COUNT)
                     {
@@ -73,13 +73,13 @@ namespace
     }
 }    // namespace
 
-namespace Board::detail::IO::digitalIn
+namespace board::detail::io::digitalIn
 {
     void init()
     {
         for (size_t i = 0; i < HW_MAX_NR_OF_DIGITAL_INPUTS; i++)
         {
-            auto pin = detail::map::buttonPin(i);
+            auto pin = detail::map::BUTTON_PIN(i);
 
 #ifndef HW_BUTTONS_EXT_PULLUPS
             CORE_MCU_IO_INIT(pin.port,
@@ -94,9 +94,9 @@ namespace Board::detail::IO::digitalIn
 #endif
         }
     }
-}    // namespace Board::detail::IO::digitalIn
+}    // namespace board::detail::io::digitalIn
 
-namespace Board::IO::digitalIn
+namespace board::io::digitalIn
 {
     bool state(size_t index, readings_t& readings)
     {
@@ -107,7 +107,7 @@ namespace Board::IO::digitalIn
 
         fillBuffer(index);
 
-        index                         = map::buttonIndex(index);
+        index                         = map::BUTTON_INDEX(index);
         readings.count                = _digitalInBuffer[index].count;
         readings.readings             = _digitalInBuffer[index].readings;
         _digitalInBuffer[index].count = 0;
@@ -131,7 +131,7 @@ namespace Board::IO::digitalIn
 
         return index + 1;
     }
-}    // namespace Board::IO::digitalIn
+}    // namespace board::io::digitalIn
 
 #include "Common.cpp.include"
 

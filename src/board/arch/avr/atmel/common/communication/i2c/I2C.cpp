@@ -57,7 +57,7 @@ namespace
     }
 }    // namespace
 
-namespace Board::I2C
+namespace board::i2c
 {
     initStatus_t init(uint8_t channel, clockSpeed_t speed)
     {
@@ -66,7 +66,7 @@ namespace Board::I2C
             return initStatus_t::ALREADY_INIT;
         }
 
-        if (core::mcu::i2c::init(channel, static_cast<uint32_t>(speed)))
+        if (core::mcu::i2c::init(channel, static_cast<core::mcu::i2c::Config::clockSpeed_t>(speed)))
         {
             _initialized = true;
             return initStatus_t::OK;
@@ -129,7 +129,7 @@ namespace Board::I2C
     {
         return core::mcu::i2c::deviceAvailable(channel, address);
     }
-}    // namespace Board::I2C
+}    // namespace board::i2c
 
 ISR(TWI_vect)
 {

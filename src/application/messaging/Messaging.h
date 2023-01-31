@@ -21,7 +21,7 @@ limitations under the License.
 #include "util/dispatcher/Dispatcher.h"
 #include "midi/src/MIDI.h"
 
-namespace Messaging
+namespace messaging
 {
     enum class eventType_t : uint8_t
     {
@@ -35,9 +35,6 @@ namespace Messaging
         MIDI_IN,
         PROGRAM,
         SYSTEM,
-        DMX_ANALOG,
-        DMX_BUTTON,
-        DMX_ENCODER,
     };
 
     // enum indicating what types of system-level messages are possible.
@@ -49,7 +46,12 @@ namespace Messaging
         PRESET_CHANGE_INC_REQ,
         PRESET_CHANGE_DEC_REQ,
         PRESET_CHANGE_DIRECT_REQ,
-        PRESET_CHANGED
+        PRESET_CHANGED,
+        BACKUP,
+        RESTORE_START,
+        RESTORE_END,
+        FACTORY_RESET_START,
+        FACTORY_RESET_END
     };
 
     struct event_t
@@ -81,6 +83,6 @@ namespace Messaging
 
         event_t() = default;
     };
-}    // namespace Messaging
+}    // namespace messaging
 
-#define MIDIDispatcher Util::Dispatcher<Messaging::eventType_t, Messaging::event_t>::instance()
+#define MIDIDispatcher util::Dispatcher<messaging::eventType_t, messaging::event_t>::instance()

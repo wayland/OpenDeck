@@ -30,27 +30,6 @@ ifeq (,$(findstring gen,$(TYPE)))
     -specs=nano.specs \
     -specs=nosys.specs
 
-    LDFLAGS += \
-    -Xlinker --defsym=CORE_MCU_FLASH_START_ADDR_USER=$(FLASH_START_ADDR)
-
-    # bootloader fw is always set to 32k
-    BOOT_SIZE := 32768
-
-    ifeq ($(TYPE),boot)
-        CORE_MCU_FLASH_SIZE_USER=$(BOOT_SIZE)
-    else
-        CORE_MCU_FLASH_SIZE_USER=$(shell echo $$(( $(CORE_MCU_FLASH_SIZE) - $(BOOT_SIZE) - $(EMU_EEPROM_FLASH_USAGE) )) )
-    endif
-
-    DEFINES += CORE_MCU_FLASH_SIZE_USER=$(CORE_MCU_FLASH_SIZE_USER)
-    LDFLAGS += -Xlinker --defsym=CORE_MCU_FLASH_SIZE_USER=$(CORE_MCU_FLASH_SIZE_USER)
-
-    ifeq ($(DEBUG), 1)
-        CPPFLAGS += -g -gdwarf-2
-        LDFLAGS  += -g -gdwarf-2
-        OPT      := -Og
-    endif
-
     ifneq ($(CORE_MCU_FPU),)
         CPPFLAGS += -mfpu=$(CORE_MCU_FPU)
         LDFLAGS  += -mfpu=$(CORE_MCU_FPU)
@@ -64,7 +43,8 @@ endif
 
 DEFINES += \
 EMUEEPROM_INCLUDE_CONFIG \
-BOARD_USE_FAST_SOFT_PWM_TIMER
+BOARD_USE_FAST_SOFT_PWM_TIMER \
+CORE_MCU_BTLDR_CACHE_WORDS_USER=8192
 
 CC        := arm-none-eabi-gcc
 CXX       := arm-none-eabi-g++

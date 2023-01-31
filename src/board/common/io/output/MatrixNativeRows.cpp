@@ -25,9 +25,9 @@ limitations under the License.
 #include "core/src/util/Util.h"
 #include <Target.h>
 
-using namespace Board::IO::digitalOut;
-using namespace Board::detail;
-using namespace Board::detail::IO::digitalOut;
+using namespace board::io::digitalOut;
+using namespace board::detail;
+using namespace board::detail::io::digitalOut;
 
 namespace
 {
@@ -49,18 +49,18 @@ namespace
     /// Used to turn the given LED row off.
     inline void ledRowOff(uint8_t row)
     {
-        auto pin = map::ledPin(row);
+        auto pin = map::LED_PIN(row);
         EXT_LED_OFF(pin.port, pin.index);
     }
 
     inline void ledRowOn(uint8_t row)
     {
-        auto pin = map::ledPin(row);
+        auto pin = map::LED_PIN(row);
         EXT_LED_ON(pin.port, pin.index);
     }
 }    // namespace
 
-namespace Board::detail::IO::digitalOut
+namespace board::detail::io::digitalOut
 {
     void init()
     {
@@ -85,7 +85,7 @@ namespace Board::detail::IO::digitalOut
 
         for (uint8_t i = 0; i < HW_NR_OF_LED_ROWS; i++)
         {
-            auto pin = detail::map::ledPin(i);
+            auto pin = detail::map::LED_PIN(i);
 
             // when rows are used from native outputs, use open-drain configuration
             CORE_MCU_IO_INIT(pin.port,
@@ -151,9 +151,9 @@ namespace Board::detail::IO::digitalOut
             core::util::BIT_READ(_ledState[arrayIndex][_pwmCounter], bit) ? ledRowOn(i) : ledRowOff(i);
         }
     }
-}    // namespace Board::detail::IO::digitalOut
+}    // namespace board::detail::io::digitalOut
 
-namespace Board::IO::digitalOut
+namespace board::io::digitalOut
 {
     void writeLEDstate(size_t index, ledBrightness_t ledBrightness)
     {
@@ -162,7 +162,7 @@ namespace Board::IO::digitalOut
             return;
         }
 
-        index = detail::map::ledIndex(index);
+        index = detail::map::LED_INDEX(index);
 
         CORE_MCU_ATOMIC_SECTION
         {
@@ -215,7 +215,7 @@ namespace Board::IO::digitalOut
 
         return 0;
     }
-}    // namespace Board::IO::digitalOut
+}    // namespace board::io::digitalOut
 
 #endif
 #endif

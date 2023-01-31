@@ -22,13 +22,13 @@ limitations under the License.
 // Stub functions are used so that firmware can be compiled without
 // resorting to ifdef mess if something isn't supported
 
-namespace Board
+namespace board
 {
     __attribute__((weak)) void update()
     {
     }
 
-    namespace IO
+    namespace io
     {
         namespace digitalIn
         {
@@ -82,108 +82,90 @@ namespace Board
             __attribute__((weak)) void indicateFirmwareUpdateStart()
             {
             }
+
+            __attribute__((weak)) void indicateFactoryReset()
+            {
+            }
         }    // namespace indicators
-    }        // namespace IO
+    }        // namespace io
 
-    namespace detail
+    namespace detail::io
     {
-        namespace USB
+        __attribute__((weak)) void init()
+        {
+        }
+
+        namespace digitalIn
         {
             __attribute__((weak)) void init()
             {
             }
-        }    // namespace USB
 
-        namespace IO
+            __attribute__((weak)) void update()
+            {
+            }
+
+            __attribute__((weak)) void flush()
+            {
+            }
+        }    // namespace digitalIn
+
+        namespace digitalOut
         {
             __attribute__((weak)) void init()
             {
             }
 
-            namespace digitalIn
+            __attribute__((weak)) void update()
             {
-                __attribute__((weak)) void init()
-                {
-                }
+            }
+        }    // namespace digitalOut
 
-                __attribute__((weak)) void update()
-                {
-                }
-
-                __attribute__((weak)) void flush()
-                {
-                }
-            }    // namespace digitalIn
-
-            namespace digitalOut
-            {
-                __attribute__((weak)) void init()
-                {
-                }
-
-                __attribute__((weak)) void update()
-                {
-                }
-            }    // namespace digitalOut
-
-            namespace analog
-            {
-                __attribute__((weak)) void init()
-                {
-                }
-            }    // namespace analog
-
-            namespace indicators
-            {
-                __attribute__((weak)) void init()
-                {
-                }
-
-                __attribute__((weak)) void update()
-                {
-                }
-
-                __attribute__((weak)) void indicateApplicationLoad()
-                {
-                }
-
-                __attribute__((weak)) void indicateBootloaderLoad()
-                {
-                }
-            }    // namespace indicators
-
-            namespace unused
-            {
-                __attribute__((weak)) void init()
-                {
-                }
-            }    // namespace unused
-
-            namespace bootloader
-            {
-                __attribute__((weak)) void init()
-                {
-                }
-            }    // namespace bootloader
-        }        // namespace IO
-
-        namespace UART
+        namespace analog
         {
-            __attribute__((weak)) Board::UART::dmxBuffer_t* dmxBuffer()
-            {
-                return 0;
-            }
-
-            __attribute__((weak)) void switchDmxBuffer()
+            __attribute__((weak)) void init()
             {
             }
-        }    // namespace UART
-    }        // namespace detail
+        }    // namespace analog
 
-    namespace USB
+        namespace indicators
+        {
+            __attribute__((weak)) void init()
+            {
+            }
+
+            __attribute__((weak)) void update()
+            {
+            }
+
+            __attribute__((weak)) void indicateApplicationLoad()
+            {
+            }
+
+            __attribute__((weak)) void indicateBootloaderLoad()
+            {
+            }
+        }    // namespace indicators
+
+        namespace unused
+        {
+            __attribute__((weak)) void init()
+            {
+            }
+        }    // namespace unused
+
+        namespace bootloader
+        {
+            __attribute__((weak)) void init()
+            {
+            }
+        }    // namespace bootloader
+    }        // namespace detail::io
+
+    namespace usb
     {
         __attribute__((weak)) void onCDCsetLineEncoding(uint32_t baudRate)
         {
         }
-    }    // namespace USB
-}    // namespace Board
+    }    // namespace usb
+}    // namespace board

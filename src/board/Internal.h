@@ -26,7 +26,7 @@ limitations under the License.
 #endif
 #include "core/src/MCU.h"
 
-namespace Board::detail
+namespace board::detail
 {
     // some boards/SDKs might require periodic calls to certain APIs:
     // enable only if needed
@@ -40,7 +40,7 @@ namespace Board::detail
         void bootloader();
     }    // namespace setup
 
-    namespace USB
+    namespace usb
     {
         /// Used to indicate current state of TX (data in in USB terminology) transfers.
         enum class txState_t : uint32_t
@@ -51,6 +51,8 @@ namespace Board::detail
         };
 
         void init();
+        void deInit();
+        void update();
 
 #ifdef HW_USB_OVER_SERIAL
         constexpr inline uint32_t USB_OVER_SERIAL_BAUDRATE = 38400;
@@ -59,13 +61,13 @@ namespace Board::detail
         /// received data is internal packet.
         /// param [in,out] cmd  Reference to variable in which read internal command is stored.
         /// returns True if internal command is read, false otherwise.
-        bool readInternal(USBLink::internalCMD_t& cmd);
+        bool readInternal(usbLink::internalCMD_t& cmd);
 
         /// Reads the buffered data already received from UART channel on which USB host is located and checks if
         /// received data is internal packet.
         /// param [in,out] cmd  Reference to variable in which read internal command is stored.
         /// returns True if internal command is read, false otherwise.
-        bool checkInternal(USBLink::internalCMD_t& cmd);
+        bool checkInternal(usbLink::internalCMD_t& cmd);
 #endif
 
         const void* cfgDescriptor(uint16_t* size);
@@ -74,95 +76,9 @@ namespace Board::detail
         const void* manufacturerString(uint16_t* size);
         const void* productString(uint16_t* size);
         const void* serialIDString(uint16_t* size, uint8_t* uid);
-    }    // namespace USB
+    }    // namespace usb
 
-    namespace UART
-    {
-        enum class dmxState_t : uint8_t
-        {
-            DISABLED,
-            IDLE,
-            BREAK_CHAR,
-            DATA,
-            WAITING_TX_COMPLETE
-        };
-
-        enum class dmxBaudRate_t : uint32_t
-        {
-            BR_BREAK = 76800,
-            BR_DATA  = 250000
-        };
-
-        struct uartPins_t
-        {
-            core::mcu::io::pin_t rx;
-            core::mcu::io::pin_t tx;
-        };
-
-        namespace MCU
-        {
-            // low-level UART API, MCU specific
-
-            /// Used to start the process of transmitting the data from UART TX buffer to UART interface.
-            /// param [in]: channel     UART channel on MCU.
-            void startTx(uint8_t channel);
-
-            /// Checks whether the transmission is complete or not for a given UART channel.
-            /// param [in]: channel     UART channel on MCU.
-            bool isTxComplete(uint8_t channel);
-
-            /// Performs low-level initialization of the specified UART channel.
-            /// param [in]: channel     UART channel on MCU.
-            /// param [in]: config_t    Structure containing configuration for given UART channel.
-            bool init(uint8_t channel, Board::UART::config_t& config);
-
-            /// Performs low-level deinitialization of the specified UART channel.
-            /// param [in]: channel UART channel on MCU.
-            bool deInit(uint8_t channel);
-        }    // namespace MCU
-
-        /// Used to store incoming data from UART to buffer.
-        /// param [in]: channel UART channel on MCU.
-        /// param [in]: data    Received data.
-        void storeIncomingData(uint8_t channel, uint8_t data);
-
-        /// Retrieves the next byte from the outgoing ring buffer.
-        /// param [in]: channel             UART channel on MCU.
-        /// param [in,out]: data            Reference to variable in which next byte to send is stored.
-        /// param [in,out]: remainingBytes  Reference to variable in which total number of bytes remanining in buffer is stored.
-        /// returns: True if byte has been successfully retrieved, false otherwise (buffer is empty).
-        bool getNextByteToSend(uint8_t channel, uint8_t& data, size_t& remainingBytes);
-
-        /// Checks if there are any bytes to send in outgoing buffer for a given UART channel.
-        /// param [in]: channel             UART channel on MCU.
-        /// returns: True if there are bytes to send, false otherwise.
-        bool bytesToSendAvailable(uint8_t channel);
-
-        /// Retrieves currently active DMX buffer.
-        Board::UART::dmxBuffer_t* dmxBuffer();
-
-        /// Switches currently active DMX buffer.
-        /// Double buffering is used for DMX to avoid tearing.
-        /// One buffer is in read-only state while the other is getting filled
-        /// with new data.
-        /// Once the full frame has been sent, buffers should be switched.
-        void switchDmxBuffer();
-
-        /// Global ISR handler for all UART events.
-        /// param [in]: channel UART channel on MCU.
-        void isr(uint8_t channel);
-    }    // namespace UART
-
-    namespace I2C
-    {
-        struct i2cPins_t
-        {
-            core::mcu::io::pin_t sda;
-            core::mcu::io::pin_t scl;
-        };
-    }    // namespace I2C
-
-    namespace IO
+    namespace io
     {
         void init();
 
@@ -172,7 +88,7 @@ namespace Board::detail
         namespace digitalIn
         {
             // constant used to easily access maximum amount of previous readings for a given digital input
-            constexpr inline size_t MAX_READING_COUNT = (8 * sizeof(((Board::IO::digitalIn::readings_t*)0)->readings));
+            constexpr inline size_t MAX_READING_COUNT = (8 * sizeof(((board::io::digitalIn::readings_t*)0)->readings));
 
             void init();
 
@@ -199,10 +115,6 @@ namespace Board::detail
             constexpr uint8_t ISR_PRIORITY = 5;
 
             void init();
-
-            /// Called in ADC ISR once the conversion is done.
-            /// param [in]: adcValue    Retrieved ADC value.
-            void isr(uint16_t adcValue);
         }    // namespace analog
 
         namespace indicators
@@ -235,5 +147,5 @@ namespace Board::detail
         {
             void init();
         }    // namespace bootloader
-    }        // namespace IO
-}    // namespace Board::detail
+    }        // namespace io
+}    // namespace board::detail

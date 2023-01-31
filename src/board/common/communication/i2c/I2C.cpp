@@ -28,7 +28,7 @@ namespace
     bool _initialized[CORE_MCU_MAX_I2C_INTERFACES];
 }    // namespace
 
-namespace Board::I2C
+namespace board::i2c
 {
     initStatus_t init(uint8_t channel, clockSpeed_t speed)
     {
@@ -37,15 +37,14 @@ namespace Board::I2C
             return initStatus_t::ALREADY_INIT;
         }
 
+        core::mcu::i2c::Config config(static_cast<core::mcu::i2c::Config::clockSpeed_t>(speed)
 #ifdef CORE_MCU_CUSTOM_PERIPHERAL_PINS
-        if (core::mcu::i2c::init(Board::detail::map::i2cPins(channel).sda,
-                                 Board::detail::map::i2cPins(channel).scl,
-                                 channel,
-                                 static_cast<uint32_t>(speed)))
-#else
-        if (core::mcu::i2c::init(channel,
-                                 static_cast<uint32_t>(speed)))
+                                          ,
+                                      board::detail::map::I2C_PINS(channel)
 #endif
+        );
+
+        if (core::mcu::i2c::init(channel, config))
         {
             _initialized[channel] = true;
             return initStatus_t::OK;
@@ -84,7 +83,7 @@ namespace Board::I2C
     {
         return core::mcu::i2c::deviceAvailable(channel, address);
     }
-}    // namespace Board::I2C
+}    // namespace board::i2c
 
 #endif
 #endif

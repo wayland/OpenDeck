@@ -1,4 +1,16 @@
+# Important - do not change the order of inclusion!
+
 include ../src/Toolchain.mk
+include ../src/Setup.mk
+-include $(BOARD_GEN_DIR_TARGET)/Makefile
+-include ../src/board/arch/$(CORE_MCU_ARCH)/Makefile
+-include ../src/board/arch/$(CORE_MCU_ARCH)/$(CORE_MCU_VENDOR)/Makefile
+-include ../src/board/arch/$(CORE_MCU_ARCH)/$(CORE_MCU_VENDOR)/variants/$(CORE_MCU_FAMILY)/Makefile
+-include ../src/board/arch/$(CORE_MCU_ARCH)/$(CORE_MCU_VENDOR)/variants/$(CORE_MCU_FAMILY)/$(CORE_MCU_MODEL)/Makefile
+-include ../src/$(TYPE)/Makefile
+include ../src/Defines.mk
+include Setup.mk
+-include $(BOARD_GEN_DIR_TARGET)/HWTestDefines.mk
 include Defines.mk
 include Sources.mk
 -include Objects.mk
@@ -9,7 +21,7 @@ LLVM_PROFDATA   := llvm-profdata
 LLVM_COV        := llvm-cov
 CLANG_FORMAT    := clang-format
 
-#passed to both c and c++ compiler
+# Passed to both C and C++ compiler
 CPPFLAGS := \
 -fprofile-instr-generate \
 -fcoverage-mapping \
@@ -21,31 +33,32 @@ CPPFLAGS := \
 -Wsign-compare \
 -Werror
 
-#c++ compiler only
+# C++ compiler only
 CXXFLAGS := \
 -std=c++20 \
 -Wpedantic \
 -Wno-inconsistent-missing-override
 
-#c compiler only
+# C compiler only
 CFLAGS := \
 -std=c11
 
-#linker
+# Linker flags
 LDFLAGS := \
 -lglog \
 -lpthread \
 -lgmock \
--lgtest
+-lgtest \
+-no-pie
 
 .DEFAULT_GOAL := test
 
-$(BUILD_DIR)/%.c.o $(BUILD_DIR_BASE)/%.c.o: %.c
+$(BUILD_DIR)/%.c.o: %.c
 	@mkdir -p $(@D)
 	@echo Building: $<
 	@$(CCACHE) $(CC) $(CPPFLAGS) $(CFLAGS) $(addprefix -D,$(DEFINES)) $(INCLUDE_DIRS_COMMON) $(INCLUDE_FILES_COMMON) -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -c "$<" -o "$@"
 
-$(BUILD_DIR)/%.cpp.o $(BUILD_DIR_BASE)/%.cpp.o: %.cpp
+$(BUILD_DIR)/%.cpp.o: %.cpp
 	@mkdir -p $(@D)
 	@echo Building: $<
 	@$(CCACHE) $(CXX) $(CPPFLAGS) $(CXXFLAGS) $(addprefix -D,$(DEFINES)) $(INCLUDE_DIRS_COMMON) $(INCLUDE_FILES_COMMON) -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -c "$<" -o "$@"
@@ -86,6 +99,6 @@ clean:
 	@echo Cleaning up.
 	@rm -rf $(BUILD_DIR_BASE)/ infer-out
 
-#debugging
+# Debugging
 print-%:
 	@echo '$($*)'

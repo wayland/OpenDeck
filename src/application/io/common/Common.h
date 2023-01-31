@@ -21,7 +21,7 @@ limitations under the License.
 #include <inttypes.h>
 #include <stddef.h>
 
-namespace IO::Common
+namespace io::common
 {
     enum class initAction_t : uint8_t
     {
@@ -36,29 +36,29 @@ namespace IO::Common
         public:
         BaseCollection() = delete;
 
-        static constexpr size_t groups()
+        static constexpr size_t GROUPS()
         {
             return sizeof...(T);
         }
 
-        static constexpr size_t size()
+        static constexpr size_t SIZE()
         {
             return (T + ...);
         }
 
-        static constexpr size_t size(size_t group)
+        static constexpr size_t SIZE(size_t group)
         {
             constexpr size_t VALUES[] = { T... };
             return VALUES[group];
         }
 
-        static constexpr size_t startIndex(size_t group)
+        static constexpr size_t START_INDEX(size_t group)
         {
             size_t index = 0;
 
             for (size_t i = 0; i < group; i++)
             {
-                index += size(i);
+                index += SIZE(i);
             }
 
             return index;
@@ -74,6 +74,8 @@ namespace IO::Common
             CDC
         };
 
+        virtual ~Allocatable() = default;
+
         virtual bool allocated(interface_t interface) = 0;
     };
-}    // namespace IO::Common
+}    // namespace io::common

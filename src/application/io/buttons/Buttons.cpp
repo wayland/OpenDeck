@@ -28,7 +28,7 @@ limitations under the License.
 #include "util/conversion/Conversion.h"
 #include "util/configurable/Configurable.h"
 
-using namespace IO;
+using namespace io;
 
 Buttons::Buttons(HWA&      hwa,
                  Filter&   filter,
@@ -37,10 +37,10 @@ Buttons::Buttons(HWA&      hwa,
     , _filter(filter)
     , _database(database)
 {
-    MIDIDispatcher.listen(Messaging::eventType_t::ANALOG_BUTTON,
-                          [this](const Messaging::event_t& event)
+    MIDIDispatcher.listen(messaging::eventType_t::ANALOG_BUTTON,
+                          [this](const messaging::event_t& event)
                           {
-                              size_t             index = event.componentIndex + Collection::startIndex(GROUP_ANALOG_INPUTS);
+                              size_t             index = event.componentIndex + Collection::START_INDEX(GROUP_ANALOG_INPUTS);
                               buttonDescriptor_t descriptor;
                               fillButtonDescriptor(index, descriptor);
 
@@ -48,10 +48,10 @@ Buttons::Buttons(HWA&      hwa,
                               processButton(index, event.value, descriptor);
                           });
 
-    MIDIDispatcher.listen(Messaging::eventType_t::TOUCHSCREEN_BUTTON,
-                          [this](const Messaging::event_t& event)
+    MIDIDispatcher.listen(messaging::eventType_t::TOUCHSCREEN_BUTTON,
+                          [this](const messaging::event_t& event)
                           {
-                              size_t index = event.componentIndex + Collection::startIndex(GROUP_TOUCHSCREEN_COMPONENTS);
+                              size_t index = event.componentIndex + Collection::START_INDEX(GROUP_TOUCHSCREEN_COMPONENTS);
 
                               buttonDescriptor_t descriptor;
                               fillButtonDescriptor(index, descriptor);
@@ -60,12 +60,12 @@ Buttons::Buttons(HWA&      hwa,
                               processButton(index, event.value, descriptor);
                           });
 
-    MIDIDispatcher.listen(Messaging::eventType_t::SYSTEM,
-                          [this](const Messaging::event_t& event)
+    MIDIDispatcher.listen(messaging::eventType_t::SYSTEM,
+                          [this](const messaging::event_t& event)
                           {
                               switch (event.systemMessage)
                               {
-                              case Messaging::systemMessage_t::FORCE_IO_REFRESH:
+                              case messaging::systemMessage_t::FORCE_IO_REFRESH:
                               {
                                   updateAll(true);
                               }
@@ -77,23 +77,23 @@ Buttons::Buttons(HWA&      hwa,
                           });
 
     ConfigHandler.registerConfig(
-        System::Config::block_t::BUTTONS,
+        sys::Config::block_t::BUTTONS,
         // read
         [this](uint8_t section, size_t index, uint16_t& value)
         {
-            return sysConfigGet(static_cast<System::Config::Section::button_t>(section), index, value);
+            return sysConfigGet(static_cast<sys::Config::Section::button_t>(section), index, value);
         },
 
         // write
         [this](uint8_t section, size_t index, uint16_t value)
         {
-            return sysConfigSet(static_cast<System::Config::Section::button_t>(section), index, value);
+            return sysConfigSet(static_cast<sys::Config::Section::button_t>(section), index, value);
         });
 }
 
 bool Buttons::init()
 {
-    for (size_t i = 0; i < Collection::size(); i++)
+    for (size_t i = 0; i < Collection::SIZE(); i++)
     {
         reset(i);
     }
@@ -157,7 +157,7 @@ void Buttons::updateSingle(size_t index, bool forceRefresh)
 
 void Buttons::updateAll(bool forceRefresh)
 {
-    for (size_t i = 0; i < Collection::size(GROUP_DIGITAL_INPUTS); i++)
+    for (size_t i = 0; i < Collection::SIZE(GROUP_DIGITAL_INPUTS); i++)
     {
         updateSingle(i, forceRefresh);
     }
@@ -165,7 +165,7 @@ void Buttons::updateAll(bool forceRefresh)
 
 size_t Buttons::maxComponentUpdateIndex()
 {
-    return Collection::size(GROUP_DIGITAL_INPUTS);
+    return Collection::SIZE(GROUP_DIGITAL_INPUTS);
 }
 
 /// Handles changes in button states.
@@ -186,39 +186,26 @@ void Buttons::processButton(size_t index, bool reading, buttonDescriptor_t& desc
     {
         bool send = true;
 
-        if (descriptor.messageType == messageType_t::PRESET_CHANGE)
+        if (descriptor.type == type_t::LATCHING)
         {
-            // change preset only on press
+            // act on press only
             if (reading)
             {
-                // don't send off message once the preset is switched (in case this button has standard message type in switched preset)
-                // pretend the button is already released
-                setState(index, false);
-            }
-        }
-        else
-        {
-            if (descriptor.type == type_t::LATCHING)
-            {
-                // act on press only
-                if (reading)
+                if (latchingState(index))
                 {
-                    if (latchingState(index))
-                    {
-                        setLatchingState(index, false);
-                        // overwrite before processing
-                        reading = false;
-                    }
-                    else
-                    {
-                        setLatchingState(index, true);
-                        reading = true;
-                    }
+                    setLatchingState(index, false);
+                    // overwrite before processing
+                    reading = false;
                 }
                 else
                 {
-                    send = false;
+                    setLatchingState(index, true);
+                    reading = true;
                 }
+            }
+            else
+            {
+                send = false;
             }
         }
 
@@ -236,7 +223,7 @@ void Buttons::processButton(size_t index, bool reading, buttonDescriptor_t& desc
 void Buttons::sendMessage(size_t index, bool state, buttonDescriptor_t& descriptor)
 {
     bool send      = true;
-    auto eventType = Messaging::eventType_t::BUTTON;
+    auto eventType = messaging::eventType_t::BUTTON;
 
     if (state)
     {
@@ -256,13 +243,6 @@ void Buttons::sendMessage(size_t index, bool state, buttonDescriptor_t& descript
         case messageType_t::MMC_PAUSE:
         case messageType_t::MMC_RECORD:
             break;
-
-        case messageType_t::DMX:
-        {
-            descriptor.event.index = 0;    // irrelevant
-            eventType              = Messaging::eventType_t::DMX_BUTTON;
-        }
-        break;
 
         case messageType_t::PROGRAM_CHANGE:
         {
@@ -415,8 +395,8 @@ void Buttons::sendMessage(size_t index, bool state, buttonDescriptor_t& descript
 
         case messageType_t::PRESET_CHANGE:
         {
-            eventType                      = Messaging::eventType_t::SYSTEM;
-            descriptor.event.systemMessage = Messaging::systemMessage_t::PRESET_CHANGE_DIRECT_REQ;
+            eventType                      = messaging::eventType_t::SYSTEM;
+            descriptor.event.systemMessage = messaging::systemMessage_t::PRESET_CHANGE_DIRECT_REQ;
         }
         break;
 
@@ -524,12 +504,12 @@ void Buttons::reset(size_t index)
 
 void Buttons::fillButtonDescriptor(size_t index, buttonDescriptor_t& descriptor)
 {
-    descriptor.type                 = static_cast<type_t>(_database.read(Database::Config::Section::button_t::TYPE, index));
-    descriptor.messageType          = static_cast<messageType_t>(_database.read(Database::Config::Section::button_t::MESSAGE_TYPE, index));
+    descriptor.type                 = static_cast<type_t>(_database.read(database::Config::Section::button_t::TYPE, index));
+    descriptor.messageType          = static_cast<messageType_t>(_database.read(database::Config::Section::button_t::MESSAGE_TYPE, index));
     descriptor.event.componentIndex = index;
-    descriptor.event.channel        = _database.read(Database::Config::Section::button_t::CHANNEL, index);
-    descriptor.event.index          = _database.read(Database::Config::Section::button_t::MIDI_ID, index);
-    descriptor.event.value          = _database.read(Database::Config::Section::button_t::VALUE, index);
+    descriptor.event.channel        = _database.read(database::Config::Section::button_t::CHANNEL, index);
+    descriptor.event.index          = _database.read(database::Config::Section::button_t::MIDI_ID, index);
+    descriptor.event.value          = _database.read(database::Config::Section::button_t::VALUE, index);
 
     // overwrite type under certain conditions
     switch (descriptor.messageType)
@@ -551,7 +531,6 @@ void Buttons::fillButtonDescriptor(size_t index, buttonDescriptor_t& descriptor)
     case messageType_t::MULTI_VAL_INC_DEC_NOTE:
     case messageType_t::MULTI_VAL_INC_RESET_CC:
     case messageType_t::MULTI_VAL_INC_DEC_CC:
-    case messageType_t::DMX:
     case messageType_t::PRESET_CHANGE:
     case messageType_t::PROGRAM_CHANGE_OFFSET_INC:
     case messageType_t::PROGRAM_CHANGE_OFFSET_DEC:
@@ -578,7 +557,7 @@ void Buttons::fillButtonDescriptor(size_t index, buttonDescriptor_t& descriptor)
 bool Buttons::state(size_t index, uint8_t& numberOfReadings, uint32_t& states)
 {
     // if encoder under this index is enabled, just return false state each time
-    if (_database.read(Database::Config::Section::encoder_t::ENABLE, _hwa.buttonToEncoderIndex(index)))
+    if (_database.read(database::Config::Section::encoder_t::ENABLE, _hwa.buttonToEncoderIndex(index)))
     {
         return false;
     }
@@ -586,24 +565,30 @@ bool Buttons::state(size_t index, uint8_t& numberOfReadings, uint32_t& states)
     return _hwa.state(index, numberOfReadings, states);
 }
 
-std::optional<uint8_t> Buttons::sysConfigGet(System::Config::Section::button_t section, size_t index, uint16_t& value)
+std::optional<uint8_t> Buttons::sysConfigGet(sys::Config::Section::button_t section, size_t index, uint16_t& value)
 {
-    int32_t readValue;
-    auto    result = _database.read(Util::Conversion::sys2DBsection(section), index, readValue) ? System::Config::status_t::ACK : System::Config::status_t::ERROR_READ;
-    value          = readValue;
+    uint32_t readValue;
+
+    auto result = _database.read(util::Conversion::SYS_2_DB_SECTION(section), index, readValue)
+                      ? sys::Config::status_t::ACK
+                      : sys::Config::status_t::ERROR_READ;
+
+    value = readValue;
 
     return result;
 }
 
-std::optional<uint8_t> Buttons::sysConfigSet(System::Config::Section::button_t section, size_t index, uint16_t value)
+std::optional<uint8_t> Buttons::sysConfigSet(sys::Config::Section::button_t section, size_t index, uint16_t value)
 {
-    auto result = _database.update(Util::Conversion::sys2DBsection(section), index, value) ? System::Config::status_t::ACK : System::Config::status_t::ERROR_WRITE;
+    auto result = _database.update(util::Conversion::SYS_2_DB_SECTION(section), index, value)
+                      ? sys::Config::status_t::ACK
+                      : sys::Config::status_t::ERROR_WRITE;
 
-    if (result == System::Config::status_t::ACK)
+    if (result == sys::Config::status_t::ACK)
     {
         if (
-            (section == System::Config::Section::button_t::TYPE) ||
-            (section == System::Config::Section::button_t::MESSAGE_TYPE))
+            (section == sys::Config::Section::button_t::TYPE) ||
+            (section == sys::Config::Section::button_t::MESSAGE_TYPE))
         {
             reset(index);
         }

@@ -24,9 +24,9 @@ limitations under the License.
 #include "board/Internal.h"
 #include <Target.h>
 
-using namespace Board::IO::analog;
-using namespace Board::detail;
-using namespace Board::detail::IO::analog;
+using namespace board::io::analog;
+using namespace board::detail;
+using namespace board::detail::io::analog;
 
 static_assert(HW_ADC_SAMPLES > 0, "At least 1 ADC sample required");
 
@@ -53,7 +53,7 @@ namespace
     }
 }    // namespace
 
-namespace Board::detail::IO::analog
+namespace board::detail::io::analog
 {
     void init()
     {
@@ -72,7 +72,7 @@ namespace Board::detail::IO::analog
 
         for (size_t i = 0; i < HW_NR_OF_ADC_CHANNELS; i++)
         {
-            auto pin = map::adcPin(i);
+            auto pin = map::ADC_PIN(i);
             core::mcu::adc::initPin(pin);
         }
 
@@ -100,11 +100,11 @@ namespace Board::detail::IO::analog
         for (uint8_t i = 0; i < 3; i++)
         {
             // few dummy reads to init ADC
-            core::mcu::adc::read(map::adcPin(0));
+            core::mcu::adc::read(map::ADC_PIN(0));
         }
 
-        core::mcu::adc::setActivePin(map::adcPin(0));
-        core::mcu::adc::enableIt(Board::detail::IO::analog::ISR_PRIORITY);
+        core::mcu::adc::setActivePin(map::ADC_PIN(0));
+        core::mcu::adc::enableIt(board::detail::io::analog::ISR_PRIORITY);
         core::mcu::adc::startItConversion();
     }
 
@@ -142,7 +142,7 @@ namespace Board::detail::IO::analog
                     }
 
                     // switch to next mux once all mux inputs are read
-                    core::mcu::adc::setActivePin(map::adcPin(_activeMux));
+                    core::mcu::adc::setActivePin(map::ADC_PIN(_activeMux));
                 }
 
                 // always switch to next read pin
@@ -152,7 +152,7 @@ namespace Board::detail::IO::analog
 
         core::mcu::adc::startItConversion();
     }
-}    // namespace Board::detail::IO::analog
+}    // namespace board::detail::io::analog
 
 #include "Common.cpp.include"
 

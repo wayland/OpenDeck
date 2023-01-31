@@ -5,7 +5,7 @@ vpath modules/%.c ../
 
 SOURCES_COMMON := 
 
-#common for all targets
+# Common for all targets
 ifeq (,$(findstring HW_USB_OVER_SERIAL_HOST,$(DEFINES)))
     SOURCES_COMMON += \
     modules/dbms/src/LESSDB.cpp \
@@ -35,7 +35,7 @@ ifeq ($(CORE_MCU_ARCH),arm)
     SOURCES_COMMON += modules/EmuEEPROM/src/EmuEEPROM.cpp
 endif
 
-#common include dirs
+# Common include dirs
 INCLUDE_DIRS_COMMON := \
 -I"./" \
 -I"./stubs" \
@@ -45,5 +45,5 @@ INCLUDE_DIRS_COMMON := \
 -I"../src/application/" \
 -I"../src/board/common" \
 -I"../src/board/arch/$(CORE_MCU_ARCH)/$(CORE_MCU_VENDOR)/variants/$(CORE_MCU_FAMILY)" \
--I"../src/$(BOARD_GEN_DIR_MCU_BASE)/$(CORE_MCU_MODEL)" \
--I"../src/$(BOARD_GEN_DIR_TARGET)/"
+-I"$(BOARD_GEN_DIR_MCU)" \
+-I"$(BOARD_GEN_DIR_TARGET)"

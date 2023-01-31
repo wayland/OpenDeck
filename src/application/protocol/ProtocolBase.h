@@ -20,20 +20,21 @@ limitations under the License.
 
 #include <inttypes.h>
 
-namespace Protocol
+namespace protocol
 {
     enum class protocol_t : uint8_t
     {
         MIDI,
-        DMX,
         AMOUNT
     };
 
     class Base
     {
         public:
+        virtual ~Base() = default;
+
         virtual bool init()   = 0;
         virtual bool deInit() = 0;
         virtual void read()   = 0;
     };
-}    // namespace Protocol
+}    // namespace protocol
