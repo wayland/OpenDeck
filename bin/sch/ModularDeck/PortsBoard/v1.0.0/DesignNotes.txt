@@ -1,0 +1,42 @@
+PCB LAYOUT HELPS
+================
+
+For PCB layout, use datasheets for:
+-	MAX17503SATP+
+-	TPS2378
+-	https://docs.wiznet.io/Product/iEthernet/W5500/w5500-evb-pico
+
+
+ETHERNET
+========
+
+PoE Splitter
+------------
+Sources for PoE Splitter design:
+-	https://www.smbaker.com/building-a-power-over-ethernet-poe-power-supply-using-a-dps5005-module
+-	https://pubudeux.com/diy-gigabit-802-3at-poe-splitter/
+-	Datasheets for TPS2378 and H6062NL
+
+Wake on LAN
+-----------
+
+For Wake on LAN, see figure 7/8 in the following link:
+
+http://www.mosaic-industries.com/embedded-systems/microcontroller-projects/electronic-circuits/push-button-switch-turn-on/latching-toggle-power-switch
+
+Ethernet Chip
+-------------
+https://docs.wiznet.io/Product/iEthernet/W5500/w5500-evb-pico
+
+POWER
+=====
+Sources for 48V->5V conversion: Datasheet for MAX17503SATP+
+
+
+OTHER
+=====
+
+Downloaded symbols from UltraLibrarian (but often had to modify
+
+
+

@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name "ModularDeck_Library")(type "KiCad")(uri "/home/wayland/Church/GeelongRPC/ICT System/OpenDeck DC-3000/DC-3000_Wiring/ModularDeck_Library.kicad_sym")(options "")(descr ""))
+  (lib (name "2023-01-09_06-38-29")(type "KiCad")(uri "/home/wayland/Church/GeelongRPC/ICT System/src/OpenDeck/bin/sch/ModularDeck/UltraLibrarian/H6062FNLT/2023-01-09_06-38-29/2023-01-09_06-38-29.kicad_sym")(options "")(descr ""))
+  (lib (name "UltraLibrarian")(type "KiCad")(uri "/home/wayland/Church/GeelongRPC/ICT System/src/OpenDeck/bin/sch/ModularDeck/UltraLibrarian/UltraLibrarian.kicad_sym")(options "")(descr ""))
+)
