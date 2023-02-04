@@ -347,12 +347,10 @@
   },
   "libraries": {
     "pinned_footprint_libs": [],
-    "pinned_symbol_libs": [
-      "Igor"
-    ]
+    "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "OpenDeck-r3.1.0.kicad_pro",
+    "filename": "MOOD-r0.1.1.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -453,48 +451,24 @@
       ""
     ],
     [
-      "5e5bfd04-f606-41d6-bd13-867940acc315",
-      "Buttons"
+      "05c410f2-806b-4540-805a-bbe7f90ea3bf",
+      "PoE"
     ],
     [
-      "6c593bc0-57ff-4e6d-a2d0-269a69c4f726",
-      "Rows 0-7"
+      "65783ee8-506b-4893-ac08-a976a2b63d8e",
+      "PowerSwitching"
     ],
     [
-      "f07ee7fd-6ba1-453f-9fef-9e048ee37ac9",
-      "Rows 8-15"
+      "125c857f-fcda-4512-8411-cfb3efc6834f",
+      "USB"
     ],
     [
       "39a23411-5570-4d11-b903-6223126e6aa9",
-      "DIN MIDI"
+      "DIN Serial"
     ],
     [
-      "6940dbab-e132-4c85-abaa-7ce75b398a95",
-      "LEDs"
-    ],
-    [
-      "50a2ebd4-a3e4-4fd4-a28f-4c605f8a869a",
-      "Analog"
-    ],
-    [
-      "2ebf855c-8ae3-4d08-8fba-a83370800082",
-      "Multiplexer 1"
-    ],
-    [
-      "2cb931e8-b849-48ec-b44a-fb9042cf1a75",
-      "Multiplexer 2"
-    ],
-    [
-      "8a545f8c-7b23-4ffb-b88e-376a8337ca4d",
-      "Multiplexer 3"
-    ],
-    [
-      "82da99fe-a037-44a0-bcf0-5af2dcac724f",
-      "Multiplexer 4"
-    ],
-    [
-      "58bdc30d-17ef-4ef0-b09d-80621fbe3b20",
-      "Indicators"
+      "141e6c0d-5ebb-4181-b195-a21fe57a3f69",
+      "Ethernet_to_SPI"
     ]
   ],
   "text_variables": {}

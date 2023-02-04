@@ -1,0 +1,51 @@
+SCHEMATIC
+=========
+
+Downloaded symbols from UltraLibrarian (but had to modify)
+
+Modifications:
+-	Set the component background to the correct colour
+-	Set all the pin types correctly
+-	cf. https://klc.kicad.org/symbol/s4/s4.3/ (and all of section 4)
+
+
+PCB LAYOUT HELPS
+================
+
+For PCB layout, see:
+-	Notes on sheets:
+	-	PoE
+	-	Original OpenDeck 3.1.0
+-	Datasheets for:
+	-	https://docs.wiznet.io/Product/iEthernet/W5500/w5500-evb-pico
+
+
+SOFTWARE
+========
+Things to do:
+-	Hardware:
+	-	Put in config for my setup
+	-	Put DMX stuff back in
+	-	Make it talk over SPI bus to other RP2040s
+		-	See https://circuitstate.com/tutorials/making-two-raspberry-pi-pico-boards-communicate-through-spi-using-c-cpp-sdk/
+		-	First byte of each packet says whether it's:
+			0:	Control codes
+				0:	SYN
+				1:	ACK + ID String
+			1:	DMX
+			2:	MIDI v1
+			3:	MIDI v2 <-- includes Capability Inquiries; when libraries exist for this, it could be useful.  https://amenote.com/?page_id=74
+	-	Make it work with W5500
+		-	Make it talk to W5500
+		-	Make it talk RTP-MIDI
+		-	Link RTP-MIDI to other MIDI stuff
+	-	Make traffic LEDs operate (basic)
+
+Things to do eventually:
+-	See if I can make config modular
+-	Build in a web interface
+-	(After redesign) See if we can attach MIDI link stuff to chip (so we can do DIN MLALs properly): https://www.eevblog.com/forum/projects/midi-connection-sense-circuit/
+	-	See if we can get (DIN) MIDI to do Active Sense: http://midi.teragonaudio.com/tech/midispec/sense.htm -- but keep in mind that MIDI 2.0 doesn't allow for DIN
+-	Make it work with MIDI 2.0: 
+	-	https://blog.adafruit.com/2022/08/19/midi-2-0-prototyping-tool-announced-adafruit-johnedgarpark-midi/
+	-	https://amenote.com/?page_id=74
