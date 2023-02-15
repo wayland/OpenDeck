@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "UltraLibrarian")(type "KiCad")(uri "/home/wayland/Church/GeelongRPC/ICT System/src/opendeck/master/bin/sch/MOOD/UltraLibrarian/UltraLibrarian.kicad_sym")(options "")(descr ""))
+  (lib (name "MOOD_Library")(type "KiCad")(uri "/home/wayland/Church/GeelongRPC/ICT System/src/opendeck/master/bin/sch/MOOD/v0.1.1/MOOD_Library.kicad_sym")(options "")(descr ""))
+)
