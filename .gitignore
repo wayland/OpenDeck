@@ -25,3 +25,7 @@ Documentation/*
 *-bak
 *.kicad_prl
 **/infer-out/*
+*#auto_saved_files#
+.~lock.*#
+*.bak
+_autosave*
